@@ -97,6 +97,12 @@
       // = 얼굴 위가 아니라 얼굴 위쪽. 묶어두면 ③비트의 '동행 페이드'(405행)도 저절로 된다.
       // 자막은 자리만 잡고 투명 — 리빌 때 나타나도 초상이 밀리지 않게.
       const photo = photoOf[row.person];
+      // 필적 자막 — 게임 중 화면에 떴던 편지 문구를 그 사람 필체 그대로(ending.script).
+      // 이름과 필체가 처음 나란히 놓이는 자리 = 반전 회수. 한용운만 초상 위 겹침(han-script)
+      // 으로 따로 구현돼 있어 script가 비어 있다.
+      const script = row.script
+        ? '<div class="scriptcap ' + (row.script_font || '') + '">' + row.script + '</div>'
+        : '';
       pLayer.innerHTML =
         '<div class="montage-group">' +
         '  <div class="namecap"></div>' +
@@ -104,6 +110,7 @@
         (photo ? '<img src="' + photo + '" alt="">' : '') +
         (isHan ? '<div class="han-script">자유는 만유의 생명이요…</div>' : '') +
         '  </div>' +
+        script +
         '  <div class="tokencap"></div>' +
         '</div>';
       const grp = pLayer.querySelector('.montage-group');

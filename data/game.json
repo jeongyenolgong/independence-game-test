@@ -4242,70 +4242,90 @@
    "person": "유관순",
    "name_caption": "유관순",
    "token": "태극기",
-   "caption": "유관순은 아우내 장날, 밤새 손수 태극기를 지어 사람들과 나누었습니다."
+   "caption": "유관순은 아우내 장날, 밤새 손수 태극기를 지어 사람들과 나누었습니다.",
+   "script": null,
+   "script_font": null
   },
   {
    "order": 2,
    "person": "윤동주",
    "name_caption": "윤동주",
    "token": "편지",
-   "caption": "편지의 글씨는 실제 윤동주의 손글씨를 바탕으로 제작되었습니다."
+   "caption": "편지의 글씨는 실제 윤동주의 손글씨를 바탕으로 제작되었습니다.",
+   "script": "그리고 나한테 주어진 길을, 걸어가야겠다.",
+   "script_font": "yun"
   },
   {
    "order": 3,
    "person": "남자현",
    "name_caption": "남자현",
    "token": "혈서 손수건",
-   "caption": "남자현은 손가락을 베어, 흰 수건에 「한국독립원」을 붉게 새겼습니다."
+   "caption": "남자현은 손가락을 베어, 흰 수건에 「한국독립원」을 붉게 새겼습니다.",
+   "script": null,
+   "script_font": null
   },
   {
    "order": 4,
    "person": "안중근",
    "name_caption": "안중근",
    "token": "편지",
-   "caption": "편지의 글씨는 실제 안중근의 손글씨를 바탕으로 제작되었습니다."
+   "caption": "편지의 글씨는 실제 안중근의 손글씨를 바탕으로 제작되었습니다.",
+   "script": "대한 독립의 소리가 천국에 들려오면, 나는 마땅히 춤추며 만세를 부르리라.",
+   "script_font": "ahn"
   },
   {
    "order": 5,
    "person": "김마리아",
    "name_caption": "김마리아",
    "token": "비밀 선언서",
-   "caption": "김마리아는 독립선언서를 옷 속에 숨겨 현해탄을 건너 들여왔습니다."
+   "caption": "김마리아는 독립선언서를 옷 속에 숨겨 현해탄을 건너 들여왔습니다.",
+   "script": null,
+   "script_font": null
   },
   {
    "order": 6,
    "person": "윤봉길",
    "name_caption": "윤봉길",
    "token": "편지",
-   "caption": "편지의 글씨는 실제 윤봉길의 손글씨를 바탕으로 제작되었습니다."
+   "caption": "편지의 글씨는 실제 윤봉길의 손글씨를 바탕으로 제작되었습니다.",
+   "script": "부모의 사랑보다, 형제의 사랑보다, 처자의 사랑보다 — 더 굳세고 강한 사랑이 있음을, 나는 깨달았소.",
+   "script_font": "yunbg"
   },
   {
    "order": 7,
    "person": "윤희순",
    "name_caption": "윤희순",
    "token": "의병가",
-   "caption": "윤희순은 여성들을 일으켜 세우려 「안사람 의병가」를 지었습니다."
+   "caption": "윤희순은 여성들을 일으켜 세우려 「안사람 의병가」를 지었습니다.",
+   "script": null,
+   "script_font": null
   },
   {
    "order": 8,
    "person": "김구",
    "name_caption": "김구",
    "token": "편지",
-   "caption": "편지의 글씨는 실제 김구의 손글씨를 바탕으로 제작되었습니다."
+   "caption": "편지의 글씨는 실제 김구의 손글씨를 바탕으로 제작되었습니다.",
+   "script": "내가 바라는 것은, 남을 누르는 힘이 아니라 우리를 행복하게 하고, 남에게도 행복을 주는 높은 문화의 힘이오.",
+   "script_font": "kimgu"
   },
   {
    "order": 9,
    "person": "안경신",
    "name_caption": "안경신",
    "token": "폭탄",
-   "caption": "안경신은 평안남도 도청을 향해 몸소 폭탄을 던졌습니다."
+   "caption": "안경신은 평안남도 도청을 향해 몸소 폭탄을 던졌습니다.",
+   "script": null,
+   "script_font": null
   },
   {
    "order": 10,
    "person": "한용운",
    "name_caption": null,
    "token": "첫 쪽지",
-   "caption": "편지의 글씨는 실제 한용운의 손글씨를 바탕으로 제작되었습니다."
+   "caption": "편지의 글씨는 실제 한용운의 손글씨를 바탕으로 제작되었습니다.",
+   "script": null,
+   "script_font": null
   }
  ],
  "relays": [

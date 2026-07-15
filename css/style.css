@@ -176,10 +176,25 @@ body{
 .montage-group.exiting{ transform:translate(-90px,54px); opacity:0; }
 /* 자막은 처음부터 자리를 차지하되 투명 — 리빌 때 나타나도 초상이 안 밀린다.
    한 번에 또렷이(한 글자씩 타이핑 X = 반전 임팩트 보존, 정본 요소③). */
-.montage-group .namecap, .montage-group .tokencap{ opacity:0; transition:opacity .5s; }
-.montage-group.named .namecap, .montage-group.named .tokencap{ opacity:1; }
+.montage-group .namecap, .montage-group .tokencap, .montage-group .scriptcap{
+  opacity:0; transition:opacity .5s; }
+.montage-group.named .namecap, .montage-group.named .tokencap,
+.montage-group.named .scriptcap{ opacity:1; }
 .montage-group .namecap{ min-height:1.2em; }
 .montage-group .tokencap{ min-height:3.4em; max-width:min(80%,560px); }
+
+/* 필적 자막(ending.script) — 게임 중 화면에 떴던 편지 문구를 그 사람 필체 그대로.
+   xlsx ending 시트 비고의 "편지(필적 자막)" 구현. 폰트는 script_font 열이 고른다.
+   ※한용운은 예외 — 초상 위 겹침(.han-script)이 이 역할을 대신한다. */
+.montage-group .scriptcap{
+  font-size:22px; line-height:1.55; color:var(--gold-lite);
+  max-width:min(88%,430px); text-align:center; text-shadow:0 2px 10px #000;
+  margin-top:-2px; }
+.scriptcap.yun{ font-family:'yun',serif; }
+.scriptcap.ahn{ font-family:'ahn',serif; }
+.scriptcap.yunbg{ font-family:'yunbg',serif; }
+.scriptcap.kimgu{ font-family:'kimgu',serif; }
+.scriptcap.han{ font-family:'han',serif; }
 
 /* L1 몽타주 초상 — ★공식 흑백 사진(정본 411행 "공식사진 채택 = 미술 원칙 전환").
    게임 본편=목판·익명 / 엔딩=실사·실명. 스타일이 걷히는 것 자체가 반전 클라이맥스.
