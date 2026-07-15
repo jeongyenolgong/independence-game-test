@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 470" width="260" height="470">
+  <!-- 유관순 : 목판 칼선 + 색부활. 무표정/미소 두 얼굴.
+       저고리=어깨~소매~겨드랑이 한 덩어리(배래선). 보따리=매듭에서 갈무리 주름. -->
+  <defs>
+    <style>
+      .ink {fill:none;stroke:#17110b;stroke-linejoin:round;stroke-linecap:round;}
+      .k4{stroke-width:4;} .k6{stroke-width:6;} .k9{stroke-width:9;}
+      .thin{fill:none;stroke:#17110b;stroke-width:2.4;stroke-linecap:round;}
+      .hair{fill:#1c140c;}
+      .cut{stroke:#efe7d4;fill:none;stroke-width:2.6;stroke-linecap:round;}
+      .hatch{stroke:#17110b;fill:none;stroke-width:2.6;stroke-linecap:round;}
+      .expr-smile{display:none;}
+    </style>
+  </defs>
+
+  <!-- 댕기는 정면에서 몸 뒤로 가려 보이지 않음(저고리 가로지르던 선 제거) -->
+
+  <!-- ===== 치마(남색) ===== -->
+  <path d="M88 188 C66 212 54 252 48 448 L212 448 C206 252 194 212 172 188 Z" fill="#33415e"/>
+  <path class="ink k9" d="M88 188 C66 212 54 252 48 448 L212 448 C206 252 194 212 172 188"/>
+  <path class="ink k4" d="M92 232 C82 320 74 392 70 446"/>
+  <path class="ink k4" d="M130 226 C129 320 129 392 130 446"/>
+  <path class="ink k4" d="M168 232 C178 320 186 392 190 446"/>
+  <path class="hatch" d="M62 332 L76 326"/>
+  <path class="hatch" d="M64 358 L78 351"/>
+  <path class="hatch" d="M68 386 L82 378"/>
+
+  <!-- ===== 목 (얼굴과 같은 살색으로 연결) ===== -->
+  <path d="M117 108 L117 151 L143 151 L143 108 Z" fill="#ecc8a2"/>
+  <path class="ink k4" d="M117 130 L117 150 M143 130 L143 150"/>
+
+  <!-- ===== 저고리(한 덩어리: 어깨~소매~겨드랑이~중앙 모임) ===== -->
+  <path d="M118 150 L84 150 C58 155 44 178 48 202 C52 222 66 236 88 240
+           C104 248 118 250 130 250 C142 250 156 248 172 240
+           C194 236 208 222 212 202 C216 178 202 155 176 150
+           L142 150 L130 196 Z" fill="#f2ece0"/>
+  <!-- 깃(남색) + 목선 안쪽 살색 노출 + 흰 동정 -->
+  <path d="M108 150 L130 194 L152 150 Z" fill="#33415e"/>
+  <path d="M118 149 L130 182 L142 149 Z" fill="#ecc8a2"/>
+  <path d="M118 150 L130 182 L142 150" fill="none" stroke="#f4efe3" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- 저고리 칼선(외곽) -->
+  <path class="ink k6" d="M118 150 L84 150 C58 155 44 178 48 202 C52 222 66 236 88 240
+           C104 248 118 250 130 250 C142 250 156 248 172 240
+           C194 236 208 222 212 202 C216 178 202 155 176 150 L142 150"/>
+  <!-- 깃 칼선(외곽) -->
+  <path class="ink k6" d="M108 150 L130 194 L152 150"/>
+  <!-- 소매 안쪽 드레이프(배래 느낌, 겨드랑이 이음) -->
+  <path class="thin" d="M80 168 C66 190 70 220 90 238"/>
+  <path class="thin" d="M180 168 C194 190 190 220 170 238"/>
+  <!-- 어깨 해칭 -->
+  <path class="hatch" d="M64 190 L76 195"/>
+  <path class="hatch" d="M62 200 L74 205"/>
+  <path class="hatch" d="M196 190 L184 195"/>
+  <path class="hatch" d="M198 200 L186 205"/>
+
+  <!-- ===== 얼굴 / 머리 ===== -->
+  <ellipse cx="130" cy="86" rx="36" ry="42" fill="#ecc8a2"/>
+  <path class="hair" d="M92 88 C88 52 108 32 130 32 C152 32 172 52 168 88 C158 68 148 58 130 58 C112 58 102 68 92 88 Z"/>
+  <ellipse class="ink k6" cx="130" cy="86" rx="36" ry="42"/>
+  <path class="ink k6" d="M92 88 C88 52 108 32 130 32 C152 32 172 52 168 88"/>
+  <path class="cut" d="M130 33 L130 57"/>
+
+  <!-- 무표정 -->
+  <g class="expr-neutral">
+    <path class="ink k4" d="M114 84 L126 84"/>
+    <path class="ink k4" d="M134 84 L146 84"/>
+    <path class="ink k4" d="M126 93 L124 101 L131 101"/>
+    <path class="ink k4" d="M122 111 L138 111"/>
+  </g>
+  <!-- 미소 -->
+  <g class="expr-smile">
+    <path class="ink k4" d="M113 85 C118 80 124 80 128 85"/>
+    <path class="ink k4" d="M132 85 C136 80 142 80 147 85"/>
+    <path class="ink k4" d="M126 93 L124 101 L131 101"/>
+    <path class="ink k4" d="M120 108 C126 115 134 115 140 108"/>
+    <ellipse cx="112" cy="99" rx="5" ry="3" fill="#e79a86" opacity=".7"/>
+    <ellipse cx="148" cy="99" rx="5" ry="3" fill="#e79a86" opacity=".7"/>
+  </g>
+
+  <!-- ===== 보따리(맨 위) : 매듭 → 갈무리 주름 → 본체 ===== -->
+  <!-- 본체 -->
+  <path d="M90 218 C88 196 106 182 130 182 C154 182 172 196 170 218 C171 240 152 252 130 252 C108 252 89 240 90 218 Z" fill="#e0d6bd"/>
+  <!-- 매듭(묶인 천 두 귀 + 중심) -->
+  <path d="M118 182 C106 172 110 156 122 162 C127 165 128 174 126 182 Z" fill="#d8ccae"/>
+  <path d="M142 182 C154 172 150 156 138 162 C133 165 132 174 134 182 Z" fill="#d8ccae"/>
+  <path d="M123 178 C125 187 135 187 137 178 C140 185 134 191 130 191 C126 191 121 185 123 178 Z" fill="#cbbb99"/>
+  <!-- 본체 칼선 -->
+  <path class="ink k6" d="M90 218 C88 196 106 182 130 182 C154 182 172 196 170 218 C171 240 152 252 130 252 C108 252 89 240 90 218 Z"/>
+  <!-- 갈무리 주름(매듭에서 본체로 모임) -->
+  <path class="thin" d="M104 226 C114 206 122 194 129 188"/>
+  <path class="thin" d="M120 232 C124 212 127 198 130 190"/>
+  <path class="thin" d="M140 232 C136 212 133 198 131 190"/>
+  <path class="thin" d="M156 226 C146 206 138 194 131 188"/>
+  <!-- 매듭 칼선 -->
+  <path class="ink k4" d="M118 182 C106 172 110 156 122 162 C127 165 128 174 126 182"/>
+  <path class="ink k4" d="M142 182 C154 172 150 156 138 162 C133 165 132 174 134 182"/>
+  <path class="ink k4" d="M123 180 C125 189 135 189 137 180"/>
+  <!-- 손(보따리 감싼) -->
+  <path d="M96 240 C86 237 80 245 85 252 C90 259 106 259 112 250 Z" fill="#e7c39d"/>
+  <path d="M164 240 C174 237 180 245 175 252 C170 259 154 259 148 250 Z" fill="#e7c39d"/>
+  <path class="ink k4" d="M96 240 C86 237 80 245 85 252 C90 259 106 259 112 250"/>
+  <path class="ink k4" d="M164 240 C174 237 180 245 175 252 C170 259 154 259 148 250"/>
+</svg>

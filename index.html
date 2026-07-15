@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>만세는 언제 부르오</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ① 타이틀 -->
+  <section id="screen-title" class="screen">
+    <div class="title-inner">
+      <h1 class="logo-main" data-k="title.logo_main">만세는 언제 부르오</h1>
+      <p class="logo-sub" data-k="title.logo_sub">10인의 독립운동가</p>
+      <button id="btn-start" class="btn-primary">시작하기</button>
+    </div>
+  </section>
+
+  <!-- 인게임 무대 -->
+  <section id="stage" class="screen hidden">
+    <div id="bg" class="bg"><div id="bg-caption" class="bg-caption"></div></div>
+
+    <!-- 미니메뉴 (우상단) -->
+    <div id="minimenu">
+      <button id="btn-codex" title="도감">▤</button>
+      <button id="btn-settings" title="설정">⚙</button>
+    </div>
+
+    <!-- 캡션 층(장소전환/이름 자막/증표 자막) -->
+    <div id="caption-layer" class="caption-layer hidden"></div>
+
+    <!-- 몽타주 초상 층(엔딩) -->
+    <div id="portrait-layer" class="portrait-layer hidden"></div>
+
+    <!-- 편지 전체화면 층(친필 서체) -->
+    <div id="letter-layer" class="letter-layer hidden">
+      <p id="letter-text" class="letter-text"></p>
+      <span class="letter-cont cont-indicator">▼</span>
+    </div>
+
+    <!-- 선택지/군중 층 -->
+    <div id="choice-layer" class="choice-layer hidden"></div>
+
+    <!-- 대사 상자 -->
+    <div id="dialogue-box" class="dialogue-box hidden">
+      <p id="dialogue-text" class="dialogue-text"></p>
+      <span id="dialogue-cont" class="cont-indicator">▼</span>
+    </div>
+
+    <!-- 학습 패널(A₂) -->
+    <div id="learn-panel" class="learn-panel hidden">
+      <div class="learn-inner">
+        <p id="learn-text" class="learn-text"></p>
+        <div class="learn-nav">
+          <button id="learn-prev">◀ 이전</button>
+          <span id="learn-progress">1/1</span>
+          <button id="learn-next">다음 ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 퀴즈 패널 -->
+    <div id="quiz-panel" class="quiz-panel hidden">
+      <div class="quiz-inner">
+        <p id="quiz-q" class="quiz-q"></p>
+        <div id="quiz-options" class="quiz-options"></div>
+        <p id="quiz-feedback" class="quiz-feedback hidden"></p>
+        <button id="quiz-continue" class="btn-primary hidden">계속</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 도감(전체화면) -->
+  <section id="screen-codex" class="screen hidden">
+    <header class="codex-header">
+      <span id="codex-progress" class="codex-side"></span>
+      <span class="codex-title" data-k="codex.title">만난 사람들</span>
+      <button id="codex-close" class="codex-side codex-x">닫기</button>
+    </header>
+    <p id="codex-guide" class="codex-guide"></p>
+    <div id="codex-grid" class="codex-grid"></div>
+  </section>
+
+  <!-- 설정(모달) -->
+  <section id="screen-settings" class="overlay hidden">
+    <div class="settings-panel">
+      <h2 data-k="settings.title">설정</h2>
+      <label class="set-row"><span data-k="settings.sfx">효과음</span>
+        <input type="range" id="set-sfx" min="0" max="100" value="80"></label>
+      <label class="set-row"><span data-k="settings.bgm">배경음</span>
+        <input type="range" id="set-bgm" min="0" max="100" value="60"></label>
+      <div class="set-row"><span data-k="settings.text_speed">글자 속도</span>
+        <div class="speed-btns">
+          <button class="speed-btn" data-speed="느리게">느리게</button>
+          <button class="speed-btn is-on" data-speed="보통">보통</button>
+          <button class="speed-btn" data-speed="빠르게">빠르게</button>
+        </div>
+      </div>
+      <button id="settings-close" class="btn-primary" data-k="settings.btn_close">닫기</button>
+    </div>
+  </section>
+
+  <!-- ⑤ 결과 -->
+  <section id="screen-result" class="screen hidden">
+    <h2 id="result-heading" class="result-heading">10인의 독립운동가</h2>
+    <div id="result-grid" class="result-grid"></div>
+    <button id="result-codex" class="result-topbtn">도감 자세히 보기</button>
+    <div class="result-foot">
+      <button id="result-exit" class="btn-ghost">종료</button>
+      <button id="result-save" class="btn-primary">저장하기</button>
+    </div>
+  </section>
+
+  <!-- 크레딧 -->
+  <section id="screen-credits" class="screen hidden">
+    <div id="credits-scroll" class="credits-scroll"></div>
+    <p class="credits-hint">화면을 누르면 처음으로 돌아갑니다</p>
+  </section>
+
+  <!-- 로딩 -->
+  <section id="screen-loading" class="screen">
+    <p class="loading-text" data-k="loading.text">불러오는 중…</p>
+  </section>
+
+</div>
+
+<script src="js/engine.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
