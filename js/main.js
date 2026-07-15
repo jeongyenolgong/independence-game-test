@@ -19,10 +19,11 @@
       console.error(e); return;
     }
     // 학년 = URL로 구분(기획: 초/중 URL 완전 분리, 게임 내 선택 없음).
-    // 실배포는 초등·중등 빌드를 각각 별도 주소로 배포. 개발 중엔 ?grade= 로 확인.
-    //   초등: (기본)  ·  중등: index.html?grade=중등
-    const qg = new URLSearchParams(location.search).get('grade');
-    window.G.grade = (qg === '중등') ? '중등' : '초등';
+    // 배포: /el/ = 초등, /md/ = 중등. 각 폴더의 index.html이 window.__GRADE 를 심어 둔다.
+    // 개발 중엔 ?grade=el|md (한글 초등|중등도 허용).
+    const GRADES = { el: '초등', md: '중등', '초등': '초등', '중등': '중등' };
+    const raw = window.__GRADE || new URLSearchParams(location.search).get('grade');
+    window.G.grade = GRADES[raw] || '초등';
     Screens.applyLabels();
     wire();
     hide('screen-loading');
