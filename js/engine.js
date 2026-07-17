@@ -59,11 +59,28 @@
     if (t.includes('폭발')) { st.classList.remove('fx-tense', 'fx-blur'); bg.classList.add('burst'); }
   }
 
-  // 무대 세팅(setStaging)은 여기서 staging.bg 서술문을 화면 한복판에 회색 글자로
-  // 띄우고 있었다. 그건 **이미지 제작용 지시문**이지 플레이어가 읽을 글이 아니고
-  // ("다시 흑백 목판 군중" 같은 제작 노트에, 후보 3인 묘사까지 그대로 들어 있다),
-  // 배경 그림을 기다리는 임시 대역이었다 → 삭제(사용자 확정 2026-07-17).
-  // 배경 그림은 staging.bg_img 칸으로 붙일 자리다(데이터는 뚫려 있고 아직 전 행 빔).
+  // ---------- 무대 세팅 = 배경 그림 ----------
+  // staging.bg_img 칸에 적힌 그림을 그 장면 배경으로 깐다. 비어 있으면(아직 안 그려진
+  // 장소) 회색 그라데이션 플레이스홀더로 남는다 — 섞여 있어도 화면이 깨지지 않게.
+  //
+  // 예전엔 여기서 staging.bg 서술문을 화면 한복판에 회색 글자로 띄웠다. 그건 이미지
+  // 제작용 지시문이지 플레이어가 읽을 글이 아니었고(후보 3인 묘사까지 노출) 배경 그림을
+  // 기다리는 임시 대역이었다 → 삭제(사용자 확정 2026-07-17).
+  function setStaging(sceneId) {
+    const stg = (window.G.data.staging || {})[sceneId] || {};
+    const bg = $('bg');
+    if (stg.bg_img) {
+      // ⚠️CSS 변수에 상대경로를 넣으면 style.css 기준으로 풀려 'css/assets/...'를 찾는다
+      // (파일이 멀쩡해도 배경이 새까맣게 뜬다). 게다가 배포본 /el/ /md/는 <base href="../">를
+      // 쓰므로 기준이 또 달라진다 → document.baseURI 기준 절대주소로 박아 둘 다 막는다.
+      const abs = new URL(stg.bg_img, document.baseURI).href;
+      bg.style.setProperty('--bg-img', 'url("' + abs + '")');
+      bg.classList.add('has-img');
+    } else {
+      bg.style.removeProperty('--bg-img');
+      bg.classList.remove('has-img');
+    }
+  }
 
   // ---------- 타자기 ----------
   function typewriter(text, styleClasses) {
@@ -215,6 +232,7 @@
 
   // ---------- 장면 재생 ----------
   Engine.playScene = async function (sceneId, onDone) {
+    setStaging(sceneId);
     resetPersistentFx();
     if (!isRevealScene(sceneId)) clearPortrait();
     $('caption-layer').classList.add('hidden');

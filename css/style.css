@@ -64,6 +64,13 @@ body{
     repeating-linear-gradient(90deg,transparent 0 38px,rgba(0,0,0,.35) 38px 42px),
     repeating-linear-gradient(0deg,transparent 0 60px,rgba(255,255,255,.03) 60px 64px);
   filter:grayscale(1); }
+/* 배경 그림(staging.bg_img) — 깔린 장면에선 위 회색 플레이스홀더·목판 줄무늬를 걷는다.
+   아직 안 그려진 장소는 .has-img가 안 붙어 그대로 회색으로 남는다.
+   ⚠️아래 .bg.color(예열)·.bg.burst(만세폭발)가 background를 통째로 갈아 이 규칙을 덮는다
+   — 일부러 그렇게 뒀다(만세 연출 보존). R9·R10 배경 그림이 들어올 때 같이 정해야 함. */
+.bg.has-img{ background-image:var(--bg-img); background-size:cover; background-position:center; }
+.bg.has-img::before{ display:none; }
+
 /* 색부활: 배경에 은은한 색 */
 .bg.color{ background:linear-gradient(180deg,#5a6b7a 0%,#7a6a52 50%,#8a4a3a 100%); }
 .bg.color::before{ filter:grayscale(0); opacity:.35; }
