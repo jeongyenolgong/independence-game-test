@@ -154,10 +154,6 @@ body{
   text-shadow:0 2px 10px #000; }
 .caption-layer .tokencap{ margin-top:12px; }
 
-/* 목판 SVG 인물 상태(.svg-host/.state-bw/.state-color) 규칙은 여기 있었다.
-   인물이 화면에서 사라지고 색부활이 폐기되면서 쓰는 데가 없어져 삭제.
-   assets/img/_preview/*.html 은 각자 인라인 CSS를 들고 있어 영향 없다. */
-
 /* 몽타주 초상 층 */
 .portrait-layer{ position:absolute; z-index:34; inset:0; display:flex;
   align-items:center; justify-content:center; pointer-events:none; }
@@ -378,4 +374,3 @@ body{
 .loading-text{ color:var(--muted); letter-spacing:3px; }
 
 /* 페이드인 유틸 */
-.fade-in{ animation:fadein .6s forwards; }

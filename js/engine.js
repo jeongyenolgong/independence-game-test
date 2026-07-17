@@ -8,16 +8,10 @@
   const FONT = { '한용운': 'han', '안중근': 'ahn', '윤동주': 'yun', '윤봉길': 'yunbg', '김구': 'kimgu' };
 
   const Engine = {};
-  let tapUnlock = null; // 현재 대사 탭 핸들러
-
-  // 목판 SVG 로더는 여기 있었다. 인물이 화면에서 사라지고(오프라인 포스터로 이동)
-  // 색부활이 폐기되면서 부르는 데가 없어져 삭제. SVG 파일 자체는 assets/img/{figures,crowd}/에
-  // 레거시로 남아 있다.
 
   // ---------- 초상 층(D 반전용) ----------
-  // 코드로 찾아낸 정답 인물의 **포스터**가 여기 올라가 ◯-2 반전 장면 내내 서 있다.
-  // 이름은 여기서 밝히지 않는다(screen_spec 【D】"화자 이름표 없음" — 실명은
-  // ◯-4 인물 맞히기에서 처음 공개). 포스터가 원래 컬러라 흑백↔색부활 이분법은 없다.
+  // 코드로 찾아낸 정답 포스터가 ◯-2 반전 장면 내내 서 있다. 이름은 여기서 밝히지
+  // 않는다(screen_spec 【D】 — 실명은 ◯-4 인물 맞히기에서 처음 공개).
   function clearPortrait() {
     const layer = $('portrait-layer');
     layer.classList.add('hidden');
@@ -31,9 +25,6 @@
     layer.appendChild(fig);
     layer.classList.remove('hidden');
   }
-  // 색부활(흑백→금빛)은 폐기됐다. fx 신호가 와도 초상에 할 일이 없다
-  // — 포스터가 처음부터 컬러이기 때문. 배경 예열(15-5)만 applyFx에 남아 있다.
-  function revivePortrait() { /* no-op — 색부활 폐기 */ }
 
   // ---------- 연출 효과 ----------
   function resetPersistentFx() {
@@ -49,23 +40,15 @@
     if (t.includes('blur')) st.classList.add('fx-blur');
     if (t.includes('비네트')) st.classList.add('fx-vignette');
     if (t.includes('긴장')) st.classList.add('fx-tense');
-    // 색부활은 규모가 둘로 갈린다(screen_spec:489). D·E획득 = 스팟(그 사람만),
-    // K = 전면(온 화면). 배경까지 물들이면 D가 K처럼 보여 만세의 클라이맥스가 죽는다.
-    // 15-5 '색부활(예열)'만 예외 — 인파 위 옅은 번짐이라 전면이 맞다.
-    if (t.includes('색부활')) {
-      revivePortrait();
-      if (t.includes('예열')) bg.classList.add('color');
-    }
+    // 색부활(초상 흑백→금빛)은 폐기 — 포스터가 처음부터 컬러라 켤 대상이 없다.
+    // 15-5 '색부활(예열)'만 살아남았다: 만세 직전 인파 위로 번지는 옅은 색.
+    if (t.includes('색부활') && t.includes('예열')) bg.classList.add('color');
     if (t.includes('폭발')) { st.classList.remove('fx-tense', 'fx-blur'); bg.classList.add('burst'); }
   }
 
   // ---------- 무대 세팅 = 배경 그림 ----------
   // staging.bg_img 칸에 적힌 그림을 그 장면 배경으로 깐다. 비어 있으면(아직 안 그려진
   // 장소) 회색 그라데이션 플레이스홀더로 남는다 — 섞여 있어도 화면이 깨지지 않게.
-  //
-  // 예전엔 여기서 staging.bg 서술문을 화면 한복판에 회색 글자로 띄웠다. 그건 이미지
-  // 제작용 지시문이지 플레이어가 읽을 글이 아니었고(후보 3인 묘사까지 노출) 배경 그림을
-  // 기다리는 임시 대역이었다 → 삭제(사용자 확정 2026-07-17).
   function setStaging(sceneId) {
     const stg = (window.G.data.staging || {})[sceneId] || {};
     const bg = $('bg');
@@ -102,8 +85,7 @@
         if (!done) { finish(); return; }
         cleanup(); resolve();
       }
-      function cleanup() { clearInterval(timer); document.getElementById('stage').removeEventListener('click', onTap); tapUnlock = null; }
-      tapUnlock = onTap;
+      function cleanup() { clearInterval(timer); document.getElementById('stage').removeEventListener('click', onTap); }
       $('stage').addEventListener('click', onTap);
     });
   }
@@ -130,11 +112,9 @@
         clearInterval(timer);
         el.textContent = text;
         $('stage').removeEventListener('click', onTap);
-        tapUnlock = null;
         resolve();
       }
       function onTap() { finish(); }
-      tapUnlock = onTap;
       $('stage').addEventListener('click', onTap);
     });
   }
@@ -180,8 +160,7 @@
         if (!done) { finishAll(); return; }
         cleanup(); resolve();
       }
-      function cleanup() { if (timer) clearInterval(timer); $('stage').removeEventListener('click', onTap); tapUnlock = null; }
-      tapUnlock = onTap;
+      function cleanup() { if (timer) clearInterval(timer); $('stage').removeEventListener('click', onTap); }
       $('stage').addEventListener('click', onTap);
     });
   }
@@ -204,8 +183,7 @@
         if (!done) { finish(); return; }
         cleanup(); layer.classList.add('hidden'); resolve();
       }
-      function cleanup() { clearInterval(timer); $('stage').removeEventListener('click', onTap); tapUnlock = null; }
-      tapUnlock = onTap;
+      function cleanup() { clearInterval(timer); $('stage').removeEventListener('click', onTap); }
       $('stage').addEventListener('click', onTap);
     });
   }
@@ -563,7 +541,6 @@
   // 인물 만남 기록(도감 해금) — 반전 장면에서 호출
   Engine.markMet = function (person) { if (person) window.G.met.add(person); };
 
-  Engine.applyFx = applyFx;
   Engine.typewriter = typewriter;
   Engine.typeAuto = typeAuto;
   Engine.identityQuiz = identityQuiz;   // 미리보기/테스트용 노출
