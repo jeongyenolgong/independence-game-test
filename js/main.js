@@ -80,10 +80,10 @@
         Engine.playScene(node.id, next); break;
       case 'introChoice':
         Engine.playIntroChoice(node.relay, next); break;
-      case 'crowd': {
-        // 정답 선택 시 해당 릴레이 인물을 만남 기록(도감 해금)
+      case 'find': {
+        // 포스터 코드로 정답 인물을 찾아내면 만남 기록(도감 해금)
         const rel = window.G.data.relays.find((r) => 'R' + r.n === node.relay);
-        Engine.playCrowd(node.relay, () => { if (rel) Engine.markMet(rel.person); next(); });
+        Engine.playFind(node.relay, () => { if (rel) Engine.markMet(rel.person); next(); });
         break;
       }
       case 'quiz':

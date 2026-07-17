@@ -69,7 +69,6 @@
     $('minimenu').classList.add('hidden');  // 엔딩(L1~L3) 미니메뉴 숨김(정본 규칙)
 
     // 배경: 만세 물결(색) 유지
-    $('bg-caption').textContent = '';
     $('stage').classList.remove('fx-tense', 'fx-blur', 'fx-vignette');
     $('bg').classList.add('color');
 

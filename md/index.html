@@ -23,7 +23,7 @@
 
   <!-- 인게임 무대 -->
   <section id="stage" class="screen hidden">
-    <div id="bg" class="bg"><div id="bg-caption" class="bg-caption"></div></div>
+    <div id="bg" class="bg"></div>
 
     <!-- 미니메뉴 (우상단) -->
     <div id="minimenu">
@@ -43,8 +43,16 @@
       <span class="letter-cont cont-indicator">▼</span>
     </div>
 
-    <!-- 선택지/군중 층 -->
+    <!-- 선택지 층(도입 2택) -->
     <div id="choice-layer" class="choice-layer hidden"></div>
+
+    <!-- 인물 찾기 층(포스터 코드 입력) — 대사창과 나란히 서야 해서 흐름 안에 둔다 -->
+    <div id="find-layer" class="find-layer hidden">
+      <div id="find-slots" class="find-slots"></div>
+      <p id="find-prompt" class="find-prompt"></p>
+      <div id="find-code" class="find-code"></div>
+      <div id="find-pad" class="find-pad"></div>
+    </div>
 
     <!-- 대사 상자 -->
     <div id="dialogue-box" class="dialogue-box hidden">

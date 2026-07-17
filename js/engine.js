@@ -1,4 +1,4 @@
-/* engine.js — 장면 재생기: 대사(타자기)·선택지·군중선택·학습·퀴즈·연출효과 */
+/* engine.js — 장면 재생기: 대사(타자기)·선택지·인물찾기(포스터 코드 입력)·학습·퀴즈·연출효과 */
 (function () {
   'use strict';
   const SPEED = { '느리게': 55, '보통': 30, '빠르게': 14 };
@@ -10,55 +10,30 @@
   const Engine = {};
   let tapUnlock = null; // 현재 대사 탭 핸들러
 
-  // ---------- 목판 SVG 로더 ----------
-  // 인물 1명 = SVG 1장. 흑백/색부활은 별도 파일이 아니라 상태 클래스로 갈린다
-  // (.state-bw = 회색필터+무표정 / .state-color = 금빛+미소). 파일럿 규약 그대로.
-  const svgCache = new Map();
-  function loadSvg(path) {
-    if (!path) return Promise.resolve(null);
-    if (!svgCache.has(path)) {
-      svgCache.set(path, fetch(path).then((r) => {
-        if (!r.ok) throw new Error('svg ' + r.status + ' ' + path);
-        return r.text();
-      }).catch((e) => { console.warn('[art] 못 불러옴:', path, e); return null; }));
-    }
-    return svgCache.get(path);
-  }
-  // 아트 미준비 인물은 img_bw가 비어 있다 → 기존 회색 플레이스홀더로 자동 폴백.
-  async function mountSvg(host, path, state) {
-    const svg = await loadSvg(path);
-    if (!svg) return false;
-    host.innerHTML = svg;
-    host.classList.add('svg-host', state || 'state-bw');
-    return true;
-  }
+  // 목판 SVG 로더는 여기 있었다. 인물이 화면에서 사라지고(오프라인 포스터로 이동)
+  // 색부활이 폐기되면서 부르는 데가 없어져 삭제. SVG 파일 자체는 assets/img/{figures,crowd}/에
+  // 레거시로 남아 있다.
 
   // ---------- 초상 층(D 반전용) ----------
-  // 군중에서 고른 정답 인물이 여기 올라가 흑백으로 서 있다가, ◯-2의
-  // fx='색부활' 신호를 받는 순간 색이 돈다. 이름은 여기서 밝히지 않는다
-  // (screen_spec 【D】"화자 이름표 없음" — 실명은 ◯-4 인물 맞히기에서 처음 공개).
+  // 코드로 찾아낸 정답 인물의 **포스터**가 여기 올라가 ◯-2 반전 장면 내내 서 있다.
+  // 이름은 여기서 밝히지 않는다(screen_spec 【D】"화자 이름표 없음" — 실명은
+  // ◯-4 인물 맞히기에서 처음 공개). 포스터가 원래 컬러라 흑백↔색부활 이분법은 없다.
   function clearPortrait() {
     const layer = $('portrait-layer');
     layer.classList.add('hidden');
     layer.innerHTML = '';
   }
-  async function showPortrait(path) {
+  function showPortrait(opt) {
     const layer = $('portrait-layer');
     layer.innerHTML = '';
-    const fig = document.createElement('div');
-    fig.className = 'stage-portrait';
+    const fig = posterCell(opt);
+    fig.classList.add('stage-portrait');
     layer.appendChild(fig);
-    const ok = await mountSvg(fig, path, 'state-bw');
-    if (!ok) { clearPortrait(); return false; }
     layer.classList.remove('hidden');
-    return true;
   }
-  function revivePortrait() {
-    const fig = $('portrait-layer').querySelector('.stage-portrait');
-    if (!fig) return;
-    fig.classList.remove('state-bw');
-    fig.classList.add('state-color');
-  }
+  // 색부활(흑백→금빛)은 폐기됐다. fx 신호가 와도 초상에 할 일이 없다
+  // — 포스터가 처음부터 컬러이기 때문. 배경 예열(15-5)만 applyFx에 남아 있다.
+  function revivePortrait() { /* no-op — 색부활 폐기 */ }
 
   // ---------- 연출 효과 ----------
   function resetPersistentFx() {
@@ -84,14 +59,11 @@
     if (t.includes('폭발')) { st.classList.remove('fx-tense', 'fx-blur'); bg.classList.add('burst'); }
   }
 
-  // ---------- 무대 세팅 ----------
-  function setStaging(sceneId) {
-    const stg = (window.G.data.staging || {})[sceneId];
-    const cap = $('bg-caption');
-    const txt = stg ? ((stg.place ? '［' + stg.place + '］  ' : '') + (stg.bg || '')) : '';
-    cap.textContent = txt;
-    cap.style.display = txt ? '' : 'none';
-  }
+  // 무대 세팅(setStaging)은 여기서 staging.bg 서술문을 화면 한복판에 회색 글자로
+  // 띄우고 있었다. 그건 **이미지 제작용 지시문**이지 플레이어가 읽을 글이 아니고
+  // ("다시 흑백 목판 군중" 같은 제작 노트에, 후보 3인 묘사까지 그대로 들어 있다),
+  // 배경 그림을 기다리는 임시 대역이었다 → 삭제(사용자 확정 2026-07-17).
+  // 배경 그림은 staging.bg_img 칸으로 붙일 자리다(데이터는 뚫려 있고 아직 전 행 빔).
 
   // ---------- 타자기 ----------
   function typewriter(text, styleClasses) {
@@ -243,7 +215,6 @@
 
   // ---------- 장면 재생 ----------
   Engine.playScene = async function (sceneId, onDone) {
-    setStaging(sceneId);
     resetPersistentFx();
     if (!isRevealScene(sceneId)) clearPortrait();
     $('caption-layer').classList.add('hidden');
@@ -322,47 +293,164 @@
     });
   };
 
-  // ---------- 군중 3인 선택(R1~R10) ----------
-  Engine.playCrowd = function (relay, onDone) {
-    const layer = $('choice-layer');
+  // ---------- 인물 찾기 = 포스터 코드 입력(R1~R10) ----------
+  // 화면엔 후보 인물이 **그려지지 않는다**. 빈 자리 + 코드 입력칸 + 대사창뿐이고,
+  // 벽에 붙은 오프라인 포스터 30장에서 사람을 찾아 3자리 코드를 쳐야 진행된다.
+  // 대사창엔 '찾아야 할 사람'의 ◯-5 예고 묘사만 뜬다(후보 3인 묘사는 어디에도 없음).
+  // 배경은 가리지 않는다 — 배경이 곧 1차 검색 필터(장터인지 강나루인지)이기 때문.
+
+  // 코드 → {릴레이 번호, 후보}. 전역 유니크라 어느 릴레이 것인지로 4갈래가 갈린다.
+  let CODES = null;
+  function codeIndex() {
+    if (CODES) return CODES;
+    CODES = new Map();
+    const ch = window.G.data.choices || {};
+    Object.keys(ch).forEach((rel) => {
+      const m = /^R(\d+)$/.exec(rel);
+      if (!m) return;
+      ch[rel].forEach((o) => { if (o.code) CODES.set(String(o.code), { n: +m[1], opt: o }); });
+    });
+    return CODES;
+  }
+
+  // 포스터 한 장. 아직 안 그려진 29장은 코드만 적힌 자리로 폴백한다
+  // (그림이 없다고 화면이 깨지지도, 정답이 새지도 않게).
+  function posterCell(opt) {
+    const cell = document.createElement('div');
+    cell.className = 'find-slot is-filled';
+    const img = document.createElement('img');
+    img.className = 'find-poster';
+    img.alt = '';
+    img.onerror = () => { cell.classList.add('is-todo'); cell.textContent = opt.code; };
+    img.src = opt.poster_img;
+    cell.appendChild(img);
+    return cell;
+  }
+
+  // 대사창에 타자기 없이 즉시 표시(묘사 복귀용). 넘길 게 없으니 ▼도 없다.
+  function showStatic(text, cls) {
+    const box = $('dialogue-box'), el = $('dialogue-text');
+    box.classList.remove('hidden');
+    el.className = 'dialogue-text ' + (cls || '');
+    el.textContent = text;
+    $('dialogue-cont').classList.add('hidden');
+  }
+
+  Engine.playFind = function (relay, onDone) {
+    const layer = $('find-layer'), slots = $('find-slots'),
+      codeEl = $('find-code'), pad = $('find-pad');
+    const L = window.G.data.labels || {};
     const opts = window.G.data.choices[relay] || [];
-    function render() {
-      layer.innerHTML = '';
-      layer.classList.remove('hidden');
-      $('dialogue-box').classList.add('hidden');
-      const hint = document.createElement('div');
-      const L = window.G.data.labels || {};
-      hint.className = 'crowd-hint'; hint.textContent = L['crowd.pick_hint'] || '군중 속에서 한 사람을 고르시오';
-      layer.appendChild(hint);
-      const row = document.createElement('div'); row.className = 'crowd-row';
-      opts.forEach((o) => {
-        const fig = document.createElement('div'); fig.className = 'crowd-fig';
-        const port = document.createElement('div'); port.className = 'crowd-portrait';
-        const label = document.createElement('div'); label.className = 'crowd-label';
-        label.textContent = o.appearance;
-        fig.appendChild(port); fig.appendChild(label);
-        // 목판 흑백 초상. 정답도 이 단계엔 흑백 — 색이 돌면 힌트가 된다(screen_spec 【B】).
-        mountSvg(port, o.img_bw, 'state-bw');
-        fig.onclick = async (e) => {
-          e.stopPropagation();
-          layer.classList.add('hidden');
-          const correct = (o.type === '정답') || (o.result && String(o.result).includes('반전'));
-          if (correct) {
-            await showPortrait(o.img_color || o.img_bw);  // 아직 흑백. 색은 ◯-2의 fx가 켠다.
-            if (onDone) onDone();
-          }
-          else {
-            if (o.response) await typewriter(o.response, o.type === '위험' ? 'emph' : 'narr');
-            $('dialogue-box').classList.add('hidden');
-            render(); // 복귀(재시도)
-          }
-        };
-        row.appendChild(fig);
-      });
-      layer.appendChild(row);
+    const here = +(/^R(\d+)$/.exec(relay) || [])[1];
+    const hint = (opts.find((o) => o.type === '정답') || {}).hint || '';
+    const index = codeIndex();
+    const filled = new Set();   // 이 장면에서 이미 자리를 채운 코드(중복 입력 시 자리 안 늘림)
+    let typed = '', busy = false;
+
+    layer.classList.remove('hidden');
+    clearPortrait();
+    $('find-prompt').textContent = L['find.prompt'] || '';
+    buildPad();
+    resetSlots();
+    showStatic(hint);
+
+    // 빈 자리 1개로 시작. 이 릴레이 사람을 찾을 때마다 그 자리가 채워지고 새 빈 자리가 선다.
+    function resetSlots() { slots.innerHTML = ''; addEmpty(); }
+    function addEmpty() {
+      const s = document.createElement('div');
+      s.className = 'find-slot is-empty';
+      s.textContent = L['find.slot'] || '?';
+      slots.appendChild(s);
+      return s;
     }
-    render();
+    // 정답이면 새 빈 자리를 세우지 않는다 — 더 찾을 사람이 없는데 빈 자리가 남으면
+    // "세 사람이 눈에 들어왔다"(◯-1 지문)와 어긋난다. 후보가 셋이므로 자리도 최대 셋.
+    function fillSlot(opt, last) {
+      const empty = slots.querySelector('.is-empty');
+      const cell = posterCell(opt);
+      if (empty) slots.replaceChild(cell, empty); else slots.appendChild(cell);
+      if (!last) addEmpty();
+    }
+
+    function buildPad() {
+      pad.innerHTML = '';
+      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '←'].forEach((k) => {
+        const b = document.createElement('button');
+        b.className = 'find-key' + (k ? '' : ' is-blank');
+        b.textContent = k;
+        if (!k) { b.disabled = true; pad.appendChild(b); return; }
+        b.onclick = (e) => { e.stopPropagation(); press(k); };
+        pad.appendChild(b);
+      });
+      renderCode();
+    }
+    function renderCode() {
+      codeEl.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const d = document.createElement('span');
+        d.className = 'find-digit' + (typed[i] ? ' is-on' : '');
+        d.textContent = typed[i] || '';
+        codeEl.appendChild(d);
+      }
+    }
+    function press(k) {
+      if (busy) return;
+      if (k === '←') { typed = typed.slice(0, -1); renderCode(); return; }
+      if (typed.length >= 3) return;
+      typed += k;
+      renderCode();
+      if (typed.length === 3) setTimeout(submit, 180);  // 세 자리째 = 자동 판정(확인 버튼 없음)
+    }
+    function clearCode() { typed = ''; renderCode(); }
+
+    // 대사가 흐르는 동안엔 키패드를 잠근다 — 탭이 대사 넘기기와 겹치므로.
+    function lock(on) { busy = on; layer.classList.toggle('is-busy', on); }
+
+    async function submit() {
+      const hitCode = typed;
+      const hit = index.get(hitCode);
+
+      // ⑤ 30장 어디에도 없는 번호(오타 등) = 입력칸만 흔들리고 지워짐. 대사 없음.
+      if (!hit) {
+        codeEl.classList.remove('shake-now'); void codeEl.offsetWidth;
+        codeEl.classList.add('shake-now');
+        clearCode();
+        return;
+      }
+      lock(true);
+      clearCode();
+
+      // ③ 이미 지나온 릴레이 사람 / ④ 아직 만날 때가 아닌 사람 = 얼굴 없이 한 마디만.
+      if (hit.n !== here) {
+        const line = hit.n < here ? (L['find.past'] || '"우리 이미 만나지 않았던가?"')
+          : (L['find.future'] || '"우리는 아직 만날 때가 아니야."');
+        await typewriter(line, '');
+        showStatic(hint);           // 묘사 즉시 복귀(타자기 없이)
+        lock(false);
+        return;
+      }
+
+      // ① 이 장면 정답 = 얼굴 삽입 → 다음
+      const o = hit.opt;
+      const correct = (o.type === '정답') || (o.result && String(o.result).includes('반전'));
+      if (!filled.has(hitCode)) { fillSlot(o, correct); filled.add(hitCode); }
+      if (correct) {
+        $('dialogue-box').classList.add('hidden');
+        await pause(700);           // 찾아낸 얼굴을 보는 한 박자
+        layer.classList.add('hidden');
+        lock(false);
+        showPortrait(o);            // ◯-2 반전 장면 내내 서 있는다
+        if (onDone) onDone();
+        return;
+      }
+      // ② 이 장면 오답 = 얼굴 삽입 → 기존 오답 대사 → 묘사 복귀
+      if (o.response) await typewriter(o.response, o.type === '위험' ? 'emph' : 'narr');
+      showStatic(hint);
+      lock(false);
+    }
   };
+
+  function pause(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
   // ---------- 유틸: 셔플·화면 흔들림 ----------
   function shuffle(a) {
@@ -461,6 +549,5 @@
   Engine.typewriter = typewriter;
   Engine.typeAuto = typeAuto;
   Engine.identityQuiz = identityQuiz;   // 미리보기/테스트용 노출
-  Engine.setStaging = setStaging;
   window.Engine = Engine;
 })();

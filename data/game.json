@@ -44,7 +44,11 @@
   "lbl.letter": "편지",
   "lbl.note": "쪽지",
   "quiz.identity_q": "지금 이 대화 속 주인공은 누구일까요?",
-  "crowd.pick_hint": "군중 속에서 한 사람을 고르시오"
+  "crowd.pick_hint": "군중 속에서 한 사람을 고르시오",
+  "find.past": "\"우리 이미 만나지 않았던가?\"",
+  "find.future": "\"우리는 아직 만날 때가 아니야.\"",
+  "find.prompt": "포스터에서 찾은 번호를 입력하시오",
+  "find.slot": "?"
  },
  "flow": [
   {
@@ -85,7 +89,7 @@
    "id": "7-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R1",
    "next": "7-2"
   },
@@ -111,7 +115,7 @@
    "id": "8-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R2",
    "next": "8-2"
   },
@@ -137,7 +141,7 @@
    "id": "9-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R3",
    "next": "9-2"
   },
@@ -163,7 +167,7 @@
    "id": "10-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R4",
    "next": "10-2"
   },
@@ -189,7 +193,7 @@
    "id": "11-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R5",
    "next": "11-2"
   },
@@ -215,7 +219,7 @@
    "id": "12-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R6",
    "next": "12-2"
   },
@@ -241,7 +245,7 @@
    "id": "13-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R7",
    "next": "13-2"
   },
@@ -267,7 +271,7 @@
    "id": "14-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R8",
    "next": "14-2"
   },
@@ -293,7 +297,7 @@
    "id": "15-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R9",
    "next": "15-2"
   },
@@ -319,7 +323,7 @@
    "id": "16-1"
   },
   {
-   "type": "crowd",
+   "type": "find",
    "relay": "R10",
    "next": "16-2"
   },
@@ -3119,8 +3123,9 @@
     "response": "순사가 눈을 부라렸다.\n\"무엇이 어째? 쓸데없는 소리 말고 썩 물러가지 못할까!\"\n나는 황급히 고개를 숙이고 물러났다.",
     "fx": "긴장(J)",
     "result": "복귀",
-    "img_bw": "assets/img/crowd/sunsa.svg",
-    "img_color": null
+    "code": "282",
+    "poster_img": "assets/img/poster/r01_l_sunsa.jpg",
+    "hint": null
    },
    {
     "pos": "중",
@@ -3129,8 +3134,9 @@
     "response": "소녀는 광주리를 고쳐 이며 갸웃했다.\n\"글쎄요… 잘 익은 곶감이 제일 값나가지요, 아마?\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": "assets/img/crowd/commoner_basketgirl.svg",
-    "img_color": null
+    "code": "141",
+    "poster_img": "assets/img/poster/r01_c_basketgirl.jpg",
+    "hint": null
    },
    {
     "pos": "우",
@@ -3139,8 +3145,9 @@
     "response": null,
     "fx": null,
     "result": "반전(7-2)",
-    "img_bw": "assets/img/figures/fig01_yugwansun.svg",
-    "img_color": "assets/img/figures/fig01_yugwansun.svg"
+    "code": "907",
+    "poster_img": "assets/img/poster/r01_r_yugwansun.jpg",
+    "hint": "\"장터를 돌다 보면, 흰 무명 저고리에 댕기를 곱게 드린 소녀를 보게 될 거요.\"\n\"무언가를 품에 감추고 있을 텐데,\""
    }
   ],
   "R2": [
@@ -3151,8 +3158,9 @@
     "response": null,
     "fx": null,
     "result": "반전(8-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "814",
+    "poster_img": "assets/img/poster/r02_l_yundongju.jpg",
+    "hint": "\"저기, 손에는 책이 있고 눈이 맑은 청년이 있을 거요.\""
    },
    {
     "pos": "중",
@@ -3161,8 +3169,9 @@
     "response": "사내가 들고 있던 책을 탁 덮으며, 나를 위아래로 훑었다.\n\"…그건 네가 알 것 없다. 한데, 품에 감춘 건 무엇이냐?\"\n나는 등줄기가 서늘해져, 얼른 사람들 틈으로 몸을 숨겼다.",
     "fx": "긴장(J)",
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "650",
+    "poster_img": "assets/img/poster/r02_c_sharpeyes.jpg",
+    "hint": null
    },
    {
     "pos": "우",
@@ -3171,8 +3180,9 @@
     "response": "장사꾼이 흘깃 올려다보았다.\n\"이거 말이오? 외상값이지 뭐요. 뉘 집이 얼마 밀렸나 적어 둔 게요.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "899",
+    "poster_img": "assets/img/poster/r02_r_ledger.jpg",
+    "hint": null
    }
   ],
   "R3": [
@@ -3183,8 +3193,9 @@
     "response": "아낙이 함지를 고쳐 이며 웃었다.\n\"흰 천? 방금 빨아 온 빨래구먼요. 볕 좋을 때 널려던 참이오.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "726",
+    "poster_img": "assets/img/poster/r03_l_laundry.jpg",
+    "hint": null
    },
    {
     "pos": "중",
@@ -3193,8 +3204,9 @@
     "response": null,
     "fx": null,
     "result": "반전(9-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "713",
+    "poster_img": "assets/img/poster/r03_c_namjahyeon.jpg",
+    "hint": "\"만주 벌판에서 온, 손끝이 붉은 여인을 만나게 될 거요.\"\n\"흰 손수건을 지니고 있을 텐데, 그이에게 이렇게 물으시오.\""
    },
    {
     "pos": "우",
@@ -3203,8 +3215,9 @@
     "response": "여인이 젖은 눈으로 나를 보았다.\n\"이 흰옷 말이오…? 지아비 상을 치르는 소복이라오.\"\n나는 목례를 하고, 조용히 물러났다.",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "509",
+    "poster_img": "assets/img/poster/r03_r_mourning.jpg",
+    "hint": null
    }
   ],
   "R4": [
@@ -3215,8 +3228,9 @@
     "response": "상인이 짐 부리던 손을 뚝 멈췄다.\n\"…손은 왜 묻나. 자네, 아까부터 사람들을 살피고 다니더군.\"\n장사치의 말투가 아니었다. 저잣거리를 '살피는' 자, 사복을 입은 순사였다.\n나는 태연한 척 값을 흥정하다, 틈을 보아 인파 속으로 몸을 숨겼다.",
     "fx": "긴장(J)",
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "739",
+    "poster_img": "assets/img/poster/r04_l_glovemerchant.jpg",
+    "hint": null
    },
    {
     "pos": "중",
@@ -3225,8 +3239,9 @@
     "response": "순사가 눈을 치켜떴다.\n\"네 이놈, 무엇을 캐고 다니느냐?\"\n나는 얼른 고개를 숙이고 물러났다. 등에 식은땀이 흘렀다.",
     "fx": "긴장(J)",
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "165",
+    "poster_img": "assets/img/poster/r04_c_bandagesunsa.jpg",
+    "hint": null
    },
    {
     "pos": "우",
@@ -3235,8 +3250,9 @@
     "response": null,
     "fx": null,
     "result": "반전(10-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "321",
+    "poster_img": "assets/img/poster/r04_r_anjunggeun.jpg",
+    "hint": "\"저기, 왼손을 늘 소매 깊이 감춘, 눈빛이 형형한 사내가 있을 거요.\""
    }
   ],
   "R5": [
@@ -3247,8 +3263,9 @@
     "response": null,
     "fx": null,
     "result": "반전(11-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "892",
+    "poster_img": "assets/img/poster/r05_l_kimmaria.jpg",
+    "hint": "\"이 장터를 벗어나, 강나루 쪽으로 가 보시오.\"\n\"현해탄을 막 건너온 여인이 있을 거요.\""
    },
    {
     "pos": "중",
@@ -3257,8 +3274,9 @@
     "response": "아낙이 아기를 추스르며 웃었다.\n\"혼인? 벌써 아이가 둘이라오. 새댁도 아닌 사람한테 별걸 다 묻네.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "859",
+    "poster_img": "assets/img/poster/r05_c_baby.jpg",
+    "hint": null
    },
    {
     "pos": "우",
@@ -3267,8 +3285,9 @@
     "response": "여인이 보따리를 고쳐 안았다.\n\"혼인은 무슨. 이 물건 팔아 입에 풀칠하기 바쁜데 무슨 소리요.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "388",
+    "poster_img": "assets/img/poster/r05_r_peddler.jpg",
+    "hint": null
    }
   ],
   "R6": [
@@ -3279,8 +3298,9 @@
     "response": "청년이 세던 엽전을 주머니에 쓸어 담으며 픽 웃었다.\n\"오래됐지. 장사치가 집에 붙어 있으면 입에 풀칠을 못 하오. 한 해의 반은 길 위에서 산다오.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "213",
+    "poster_img": "assets/img/poster/r06_l_pedlaryouth.jpg",
+    "hint": null
    },
    {
     "pos": "중",
@@ -3289,8 +3309,9 @@
     "response": null,
     "fx": null,
     "result": "반전(12-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "455",
+    "poster_img": "assets/img/poster/r06_c_yunbonggil.jpg",
+    "hint": "\"저기, 충청도에서 온 젊은 사내를 찾으시오. 눈매가 곧은 얼굴이지요.\""
    },
    {
     "pos": "우",
@@ -3299,8 +3320,9 @@
     "response": "청년이 짚신 끈을 조여 매며 고개를 들었다.\n\"고향 떠나 한양에 일자리 구하러 가는 길이오. 갈 길이 머니 어서 비켜 주시오.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "797",
+    "poster_img": "assets/img/poster/r06_r_traveler.jpg",
+    "hint": null
    }
   ],
   "R7": [
@@ -3311,8 +3333,9 @@
     "response": "노파가 지팡이를 고쳐 짚으며 눈을 가늘게 떴다.\n\"노래는 무슨. 고개 넘기가 하도 힘겨워 부처님을 부른 게요. 나무아미타불…\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "267",
+    "poster_img": "assets/img/poster/r07_l_prayingold.jpg",
+    "hint": null
    },
    {
     "pos": "중",
@@ -3321,8 +3344,9 @@
     "response": "아낙이 등에 업힌 아이를 다독이며 웃었다.\n\"우리 아기 재우는 자장가라오. 애를 낳아 보면 절로 나오는 노래지.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "921",
+    "poster_img": "assets/img/poster/r07_c_lullaby.jpg",
+    "hint": null
    },
    {
     "pos": "우",
@@ -3331,8 +3355,9 @@
     "response": null,
     "fx": null,
     "result": "반전(13-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "707",
+    "poster_img": "assets/img/poster/r07_r_yunhuisun.jpg",
+    "hint": "\"저 고갯길 쪽으로 가면, 나이 지긋한 아낙이 나직이 노래를 흥얼거리고 있을 거요.\""
    }
   ],
   "R8": [
@@ -3343,8 +3368,9 @@
     "response": null,
     "fx": null,
     "result": "반전(14-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "900",
+    "poster_img": "assets/img/poster/r08_l_kimgu.jpg",
+    "hint": "\"이 고개를 넘으면, 덩치가 큰 중년의 사내를 만날 거요.\""
    },
    {
     "pos": "중",
@@ -3353,8 +3379,9 @@
     "response": "장정이 사발을 내려놓으며 껄껄 웃었다.\n\"젊은이? 방금 같이 마시던 놈이라면 뒷간에 갔소. 아는 사이면 내 불러다 주리까?\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "743",
+    "poster_img": "assets/img/poster/r08_c_drunk.jpg",
+    "hint": null
    },
    {
     "pos": "우",
@@ -3363,8 +3390,9 @@
     "response": "사내가 삿갓 밑으로 눈을 치켜뜨며, 나를 위아래로 훑었다.\n\"젊은이? 누굴 찾는 게요. 무슨 일로 그러시오?\"\n순간 등골이 서늘했다. 나는 아무 일도 아니라는 듯 고개를 숙이고 슬그머니 물러났다.",
     "fx": "긴장(J)",
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "712",
+    "poster_img": "assets/img/poster/r08_r_hatman.jpg",
+    "hint": null
    }
   ],
   "R9": [
@@ -3375,8 +3403,9 @@
     "response": "여인이 머리에 인 광주리를 추스르며 종종걸음을 쳤다.\n\"무슨 걱정이겠소. 널어 둔 곡식이며 빨래가 젖을까, 그게 걱정이지요.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "463",
+    "poster_img": "assets/img/poster/r09_l_basket.jpg",
+    "hint": null
    },
    {
     "pos": "중",
@@ -3385,8 +3414,9 @@
     "response": null,
     "fx": null,
     "result": "반전(15-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "279",
+    "poster_img": "assets/img/poster/r09_c_ankyeongsin.jpg",
+    "hint": "\"이 길을 따라 저잣거리로 내려가면, 장옷을 깊이 눌러쓴 여인이 있을 거요.\""
    },
    {
     "pos": "우",
@@ -3395,8 +3425,9 @@
     "response": "여인이 좌판의 물건을 주섬주섬 보자기에 쌌다.\n\"비 오면 장사를 접어야 하니 그게 걱정이지. 어서 들어가 봐야겠소.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "934",
+    "poster_img": "assets/img/poster/r09_r_packing.jpg",
+    "hint": null
    }
   ],
   "R10": [
@@ -3407,8 +3438,9 @@
     "response": "탁발승이 목탁을 두드리던 손을 멈추고 눈을 크게 떴다.\n\"만세라니, 그런 위험한 말을 함부로 입에 올리지 마시오. 나무아미타불…\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "941",
+    "poster_img": "assets/img/poster/r10_l_begging.jpg",
+    "hint": null
    },
    {
     "pos": "중",
@@ -3417,8 +3449,9 @@
     "response": "노승이 지팡이에 몸을 기대며 고개를 저었다.\n\"나는 이 산 저 산 떠도는 중이오. 속세의 일에는 끼어들지 않는다오.\"",
     "fx": null,
     "result": "복귀",
-    "img_bw": null,
-    "img_color": null
+    "code": "306",
+    "poster_img": "assets/img/poster/r10_c_wandering.jpg",
+    "hint": null
    },
    {
     "pos": "우",
@@ -3427,8 +3460,9 @@
     "response": null,
     "fx": null,
     "result": "반전(16-2)",
-    "img_bw": null,
-    "img_color": null
+    "code": "433",
+    "poster_img": "assets/img/poster/r10_r_hanyongun.jpg",
+    "hint": "\"이 길 끝 장터 한복판에, 장삼을 걸친 노스님이 계실 거요.\""
    }
   ],
   "도입": [
@@ -3439,8 +3473,9 @@
     "response": "\"지금은 모르는 편이 나을 거요. 그저, 옳은 사람에게 닿기만 하면 되오.\"",
     "fx": null,
     "result": "장면5",
-    "img_bw": null,
-    "img_color": null
+    "code": null,
+    "poster_img": null,
+    "hint": null
    },
    {
     "pos": "②",
@@ -3449,8 +3484,9 @@
     "response": null,
     "fx": null,
     "result": "장면5",
-    "img_bw": null,
-    "img_color": null
+    "code": null,
+    "poster_img": null,
+    "hint": null
    }
   ]
  },
