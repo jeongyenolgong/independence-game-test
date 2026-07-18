@@ -22,6 +22,9 @@
   <!-- 인게임 무대 -->
   <section id="stage" class="screen hidden">
     <div id="bg" class="bg"></div>
+    <!-- 앞 배경이 남아 사라지는 층(디졸브). 새 배경은 #bg에 즉시 깔리고, 이 층이 그 위에서
+         옛 그림을 들고 서서히 지워진다 — background-image는 transition이 안 먹으므로. -->
+    <div id="bg-prev" class="bg-prev"></div>
 
     <!-- 미니메뉴 (우상단) -->
     <div id="minimenu">
@@ -46,8 +49,9 @@
 
     <!-- 인물 찾기 층(포스터 코드 입력) — 대사창과 나란히 서야 해서 흐름 안에 둔다 -->
     <div id="find-layer" class="find-layer hidden">
-      <div id="find-slots" class="find-slots"></div>
+      <!-- 안내 문구가 포스터 자리보다 위 — "안내→포스터→입력" 순으로 읽힌다(사용자 확정) -->
       <p id="find-prompt" class="find-prompt"></p>
+      <div id="find-slots" class="find-slots"></div>
       <div id="find-code" class="find-code"></div>
       <div id="find-pad" class="find-pad"></div>
     </div>

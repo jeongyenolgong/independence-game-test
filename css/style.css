@@ -20,6 +20,10 @@
 }
 
 *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+/* 한글 줄바꿈 — 낱말 단위로만 끊는다(사용자 확정 원칙).
+   기본값이면 "…바탕으로 제 / 작되었습니다"처럼 낱말이 두 줄로 쪼개진다.
+   keep-all = 어절 안에서 안 끊음 / break-word = 한 어절이 줄보다 길 때만 예외로 끊음. */
+body{ word-break:keep-all; overflow-wrap:break-word; }
 html,body,#app{ height:100%; }
 body{
   background:var(--ink); color:var(--text); font-family:var(--dlg-font);
@@ -47,8 +51,16 @@ body{
 .btn-ghost:active{ background:rgba(255,255,255,.05); }
 
 /* ---------- ① 타이틀 ---------- */
-#screen-title{ background:radial-gradient(circle at 50% 30%,#2a2016,#0e0b08); }
-.title-inner{ text-align:center; }
+/* 배경 = 동트기 전 저잣길(title_dawn). ⚠️상대경로는 이 css 파일 기준으로 풀린다
+   (css/style.css → ../assets/…). 배포본 /el/ /md/의 <base href="../">는 CSS url()엔
+   영향을 주지 않으므로 로컬·배포 양쪽에서 이 경로 그대로 맞는다. */
+#screen-title{ background:url("../assets/img/bg/title_dawn.jpg") center/cover no-repeat, #0e0b08; }
+/* 로고·부제·금빛 시작 버튼이 밝은 흙길 위에서 죽지 않게 한 겹 눌러준다.
+   그림을 어둡게 만드는 게 아니라 글자 자리만 눌러, 처마·안개는 그대로 배어 나오게. */
+#screen-title::before{ content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(115% 85% at 50% 46%,
+    rgba(14,11,8,.74) 0%, rgba(14,11,8,.40) 42%, rgba(14,11,8,.78) 100%); }
+.title-inner{ position:relative; z-index:1; text-align:center; }
 .logo-main{ font-family:'kimgu',serif; font-size:52px; color:var(--paper);
   letter-spacing:6px; margin-bottom:10px; text-shadow:0 2px 12px #000; }
 .logo-sub{ color:var(--gold); letter-spacing:8px; margin-bottom:44px; font-size:15px; }
@@ -57,7 +69,11 @@ body{
 #stage{ justify-content:flex-end; }
 .bg{ position:absolute; inset:0;
   background:linear-gradient(180deg,#3a352c 0%,#2a251d 55%,#16130e 100%);
-  display:flex; align-items:center; justify-content:center; transition:filter .5s, background .8s; }
+  display:flex; align-items:center; justify-content:center;
+  /* ⚠️background 전체를 전환 대상에 넣으면 background-position까지 애니메이션돼,
+     첫 그림이 왼쪽 위 → 가운데로 '미끄러져' 들어온다(사용자 지적: 슬라이드처럼 넘어감).
+     배경 갈아끼움의 부드러움은 #bg-prev 디졸브가 담당하므로 여기선 색만 전환한다. */
+  transition:filter .5s, background-color .8s; }
 /* 흑백 목판 군중 플레이스홀더 */
 .bg::before{ content:''; position:absolute; inset:0; opacity:.5;
   background:
@@ -71,16 +87,31 @@ body{
 .bg.has-img{ background-image:var(--bg-img); background-size:cover; background-position:center; }
 .bg.has-img::before{ display:none; }
 
-/* 색부활: 배경에 은은한 색 */
-.bg.color{ background:linear-gradient(180deg,#5a6b7a 0%,#7a6a52 50%,#8a4a3a 100%); }
-.bg.color::before{ filter:grayscale(0); opacity:.35; }
-/* 만세 폭발 */
-.bg.burst{ animation:burst 1.2s ease forwards; }
-@keyframes burst{
-  0%{ filter:grayscale(1) brightness(1); }
-  40%{ filter:grayscale(.3) brightness(1.4); }
-  100%{ filter:grayscale(0) brightness(1.05);
-    background:linear-gradient(180deg,#6aa0c8,#d8a24a 60%,#c8453d); }
+/* 만세 직전 '눌러둠' — 15-5부터 배경이 서서히 색을 잃고 어두워진다.
+   9초에 걸쳐 천천히 가라앉으므로 한용운 구간(16-1~16-4) 내내 조여드는 느낌이 된다.
+   폭발(16-5)에서 이 클래스를 떼면 새 배경이 제 색으로 터진다 = 대비가 폭발을 만든다.
+   ⚠️예전엔 이 자리가 '색부활'이었고 background를 그라데이션으로 통째로 갈아,
+   애써 그린 배경 그림이 사라졌다(한용운 구간·엔딩 내내 그라데이션이던 원인). */
+.bg.hold{ filter:grayscale(.55) brightness(.62) saturate(.5); transition:filter 9s ease; }
+
+/* ---------- 배경 전환 = 디졸브 ----------
+   background-image엔 transition이 안 먹는다. 그래서 #bg에 새 그림을 즉시 깔고,
+   그 위에 선 #bg-prev가 옛 그림을 들고 서서히 지워지게 한다(겹쳐 떠오르는 붓질). */
+.bg-prev{ position:absolute; inset:0; z-index:1; opacity:0; pointer-events:none;
+  background-size:cover; background-position:center; }
+.bg-prev.is-fading{ animation:bgdissolve .8s ease forwards; }
+@keyframes bgdissolve{ from{ opacity:1 } to{ opacity:0 } }
+
+/* ---------- 만세 = 서서히 밝아짐 (2026-07-18 교체) ----------
+   ⚠️예전엔 '암전 후 폭발'이었다 — 검은 층(#bg-flash)이 화면을 덮었다가 원색 그라데이션으로
+   터지며 걷히고, 배경은 흑백에서 색으로 풀렸다. 유화 배경이 들어오자 이 연출이 그림과
+   따로 놀았다(사용자 판정) → 삭제하고, 만세 그림이 어둠에서 제 밝기로 떠오르는 것 하나로 바꿨다.
+   흑백→색 단계도 같이 뺐다: 배경 열 장이 이미 회색조 유화라, 밝아지는 것만으로 색이 돌아온다.
+   #bg-flash 층과 blackburst·burstcolor 키프레임은 쓰는 곳이 없어져 지웠다. */
+.bg.burst{ animation:manserise 3.2s cubic-bezier(.33,0,.2,1) forwards; }
+@keyframes manserise{
+  0%{   filter:brightness(.22) saturate(.35); }   /* 15-5부터 눌려 있던 .hold를 이어받는 어둠 */
+  100%{ filter:brightness(1.04) saturate(1.02); }
 }
 
 /* 연출 효과 */
@@ -120,6 +151,8 @@ body{
 .dialogue-text.letter.yun{ font-family:'yun'; } .dialogue-text.letter.yunbg{ font-family:'yunbg'; }
 .dialogue-text.letter.kimgu{ font-family:'kimgu'; }
 .dialogue-text.emph{ color:var(--gold-lite); }
+/* 엔딩 마지막 — 대사창이 조용히 걷힌다(결과 화면 직행 대신 여운 한 박자). */
+.dialogue-box.fading{ transition:opacity 1.2s ease; opacity:0; }
 .cont-indicator{ position:absolute; right:20px; bottom:8px; color:var(--gold);
   font-size:13px; animation:blink 1.1s infinite; }
 @keyframes blink{ 0%,100%{opacity:.2} 50%{opacity:1} }
@@ -128,8 +161,9 @@ body{
 .caption-layer{ position:absolute; z-index:35; left:0; right:0; top:38%;
   text-align:center; pointer-events:none;
   transition:transform 1.1s ease-in, opacity 1.1s ease-in; }
-/* L1 ③비트 — 이름 자막·증표 자막은 얼굴을 따라 함께 흐른다(정본 405행 "동행 페이드") */
-.caption-layer.exiting{ transform:translate(-90px,54px); opacity:0; }
+/* L1 ③비트 — 자막도 얼굴과 함께 사라진다. 예전엔 왼쪽 아래로 흘러 '만세 물결에
+   합류'하는 궤적이었으나, 화면 전환을 디졸브로 통일하기로 해 걷었다(사용자 확정). */
+.caption-layer.exiting{ opacity:0; }
 .caption-layer .place{ color:var(--paper); font-size:22px; letter-spacing:6px;
   text-shadow:0 2px 10px #000; }
 /* 편지 전체화면(친필 서체 — 대사창 아닌 화면 전체) */
@@ -160,14 +194,19 @@ body{
 /* D 반전 — 코드로 찾아낸 정답 포스터를 중앙에(대사상자 위 여백에 맞춰 살짝 올림).
    찾기 화면의 작은 자리(.find-slot)를 그대로 재활용하므로, 폭 78px 고정을 여기서 푼다
    — 두 클래스로 특정도를 올리지 않으면 뒤에 오는 .find-slot 규칙에 눌려 짜부라진다. */
-.portrait-layer .stage-portrait{ height:56%; width:auto; margin-bottom:12%;
+/* ⚠️margin-bottom을 %로 잡으면 화면 높이에 따라 대사상자를 파고든다(사용자 지적).
+   대사상자 실제 높이(min-height 118 + 위아래 여백)를 층의 아래 여백으로 잡아 그 위에 세운다. */
+/* 대사창을 피해 앉는 여백. 고정값(158px)이면 대사가 3줄인 인물에서만 초상이 파묻혔다
+   — 대사창은 글이 길수록 위로 자라기 때문. 실제 대사창 높이를 재서 따라가게 한다. */
+.portrait-layer{ padding-bottom:calc(var(--dlg-h, 158px) + 14px); box-sizing:border-box; }
+.portrait-layer .stage-portrait{ height:min(56%, 100%); width:auto;
   animation:fadein .5s forwards; }
 /* L1 몽타주 덩어리 — 이름 자막 / 초상 / 증표 자막이 한 몸으로 움직인다.
    묶는 이유 둘: ①정본 "초상 위 캡션 층" = 얼굴 위쪽이지 얼굴 위가 아니다(실사진이
    들어오면 얼굴을 가린다) ②③비트 '동행 페이드'(405행)가 저절로 따라온다. */
 .montage-group{ display:flex; flex-direction:column; align-items:center; gap:14px;
-  margin-top:-30px; transition:transform 1.1s ease-in, opacity 1.1s ease-in; }
-.montage-group.exiting{ transform:translate(-90px,54px); opacity:0; }
+  margin-top:-30px; transition:opacity 1.1s ease-in; }
+.montage-group.exiting{ opacity:0; }
 /* 자막은 처음부터 자리를 차지하되 투명 — 리빌 때 나타나도 초상이 안 밀린다.
    한 번에 또렷이(한 글자씩 타이핑 X = 반전 임팩트 보존, 정본 요소③). */
 .montage-group .namecap, .montage-group .tokencap, .montage-group .scriptcap{
@@ -179,16 +218,16 @@ body{
 
 /* 필적 자막(ending.script) — 게임 중 화면에 떴던 편지 문구를 그 사람 필체 그대로.
    xlsx ending 시트 비고의 "편지(필적 자막)" 구현. 폰트는 script_font 열이 고른다.
-   ※한용운은 예외 — 초상 위 겹침(.han-script)이 이 역할을 대신한다. */
+   ※열 명 모두 같은 자리. 한용운만 초상 위 겹침이었으나 이름 자막을 넣으면서 폐기. */
 .montage-group .scriptcap{
   font-size:22px; line-height:1.55; color:var(--gold-lite);
   max-width:min(88%,430px); text-align:center; text-shadow:0 2px 10px #000;
   margin-top:-2px; }
 .scriptcap.yun{ font-family:'yun',serif; }
 .scriptcap.ahn{ font-family:'ahn',serif; }
+.scriptcap.han{ font-family:'han',serif; }
 .scriptcap.yunbg{ font-family:'yunbg',serif; }
 .scriptcap.kimgu{ font-family:'kimgu',serif; }
-.scriptcap.han{ font-family:'han',serif; }
 
 /* L1 몽타주 초상 — ★공식 흑백 사진(정본 411행 "공식사진 채택 = 미술 원칙 전환").
    게임 본편=목판·익명 / 엔딩=실사·실명. 스타일이 걷히는 것 자체가 반전 클라이맥스.
@@ -204,26 +243,24 @@ body{
 .montage-portrait.revived{ filter:grayscale(1) brightness(1.08) contrast(1.12);
   border-color:var(--gold);
   box-shadow:0 0 46px rgba(200,162,74,.75), 0 0 110px rgba(200,162,74,.32); }
-/* ③ 스쳐 지나감 — 금빛이 먼저 스러지고, 왼쪽 아래 물결로 흘러 군중에 섞인다.
-   사진이 흑백이라 금빛만 빠지면 군중과 동일 톤 = 다시 익명(정본 405행).
-   🔧 궤적은 '만세 인파 물결' 미술에 종속 — 배경 확정 시 변동 가능(대안=z축 심도형). */
+/* ③ 스쳐 지나감 — 금빛이 스러지며 그 자리에서 그대로 사라진다.
+   예전엔 왼쪽 아래로 흘러 만세 물결에 합류하는 궤적이었으나, 화면 전환을 전부
+   디졸브로 통일하기로 해 이동을 걷었다(사용자 확정). */
 .montage-portrait.exiting{ filter:grayscale(1) contrast(1.05);
-  border-color:#444; box-shadow:none;
-  transform:translate(-90px,54px) scale(.9); opacity:0; }
-.montage-portrait .han-script{ position:absolute; bottom:-30px; left:50%;
-  transform:translateX(-50%); font-family:'han'; font-size:20px; color:var(--gold-lite);
-  white-space:nowrap; opacity:0; transition:opacity 1.4s; }
-.montage-portrait .han-script.show{ opacity:1; }
+  border-color:#444; box-shadow:none; opacity:0; }
+
 
 /* 선택지/군중 층 */
 .choice-layer{ position:absolute; z-index:38; inset:0; display:flex;
   flex-direction:column; align-items:center; justify-content:center; gap:14px;
   background:rgba(0,0,0,.35); }
+/* A2안 「한지 전단」 — 조작 UI는 종이·먹으로 통일(학습 패널과 같은 언어). */
 .choice-btn{ font-family:var(--dlg-font); width:min(80%,460px); text-align:left;
-  background:linear-gradient(180deg,rgba(40,32,20,.96),rgba(26,20,12,.98));
-  color:var(--text); border:1px solid var(--line); border-radius:12px;
+  background:rgba(var(--paper-rgb),.93); color:var(--ink);
+  border:1px solid rgba(var(--ink-line),.4); border-radius:2px;
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
   padding:16px 20px; font-size:16px; line-height:1.6; cursor:pointer; }
-.choice-btn:active{ border-color:var(--gold); }
+.choice-btn:active{ background:rgba(214,204,184,.96); box-shadow:0 1px 3px rgba(0,0,0,.35); }
 /* ---------- 인물 찾기 층(포스터 코드 입력) ---------- */
 /* 군중 3인을 그려 놓고 고르게 하던 자리. 이제 화면엔 인물이 없고, 벽에 붙은
    포스터에서 찾은 3자리 코드를 친다. 전면을 덮지 않는 이유 둘:
@@ -233,32 +270,52 @@ body{
   align-items:center; gap:12px; margin:0 14px 10px; }
 .find-layer.is-busy .find-pad{ pointer-events:none; opacity:.45; }
 
+/* ── A2안 「한지 전단」(사용자 확정 2026-07-18) ───────────────────────────
+   금빛·어두운 판을 걷고, 배경 유화에서 실제로 뽑은 종이색으로 통일한다.
+   금색은 그림에 없는 색이라 얹으면 UI만 따로 떠 보였다.
+   대사창은 손대지 않는다 — 편지 필적(금색)·엔딩 자막이 걸려 있어서다. */
+:root{ --paper-rgb:238,230,213; --ink:#2b2118; --ink-soft:#6b5a44; --ink-line:60,48,34; }
+
 /* 빈 자리 — 진입 땐 1개. 이 릴레이 사람을 찾을 때마다 채워지고 새 빈 자리가 선다. */
-.find-slots{ display:flex; gap:10px; justify-content:center; align-items:flex-end; }
-.find-slot{ width:78px; aspect-ratio:1024/1536; border-radius:8px;
+.find-slots{ display:flex; gap:14px; justify-content:center; align-items:flex-end; }
+/* 78px→150px. 포스터에서 찾아온 그림을 알아볼 수 있어야 하는데 너무 작았다(사용자 지적).
+   세 자리가 다 차도(후보 최대 3) 가로가 넘치지 않는 크기다. */
+.find-slot{ width:150px; aspect-ratio:1024/1536; border-radius:2px;
   display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.find-slot.is-empty{ border:2px dashed rgba(200,162,74,.5); background:rgba(0,0,0,.22);
-  color:rgba(200,162,74,.55); font-size:24px; }
-.find-slot.is-filled{ border:2px solid var(--gold); box-shadow:0 0 14px rgba(200,162,74,.3);
+.find-slot.is-empty{ border:1px solid rgba(var(--ink-line),.45);
+  background:rgba(var(--paper-rgb),.82); color:rgba(var(--ink-line),.5);
+  font-size:34px; box-shadow:0 3px 14px rgba(0,0,0,.35); }
+/* 금테 없음 — 회화(유화) 포스터에 금빛 테두리·광채를 두르면 그림과 따로 논다(사용자 확정).
+   그림 자체가 사각이라 경계는 이미 서므로, 바닥에 앉히는 옅은 그림자만 남긴다. */
+.find-slot.is-filled{ border:0; box-shadow:0 3px 14px rgba(0,0,0,.5);
   animation:fadein .45s forwards; }
 /* 아직 안 그려진 포스터 = 코드만 적힌 자리(그림 없다고 화면이 깨지지 않게) */
 .find-slot.is-todo{ background:repeating-linear-gradient(45deg,#2b2b2b 0 8px,#343434 8px 16px);
-  color:var(--gold-lite); font-size:20px; letter-spacing:2px; }
+  color:#e8e2d6; font-size:20px; letter-spacing:2px; }
 .find-poster{ width:100%; height:100%; object-fit:cover; display:block; }
 
-/* 입력칸 — 세 자리째를 누르면 확인 버튼 없이 바로 판정된다. */
-.find-prompt{ color:var(--muted); font-size:13px; letter-spacing:1px; }
-.find-code{ display:flex; gap:10px; }
-.find-digit{ width:38px; height:46px; border-radius:7px; border:1px solid var(--line);
-  background:rgba(0,0,0,.4); color:var(--gold-lite);
-  font-family:var(--dlg-font); font-size:26px; line-height:46px; text-align:center; }
-.find-digit.is-on{ border-color:var(--gold); }
+/* 안내 문구 — 포스터 자리보다 위에 선다(index.html 순서). 아래에 두면 입력 결과인지
+   안내인지 애매했고, 배경 그림에 묻혀 안 보였다(사용자 지적). */
+.find-prompt{ color:var(--ink); font-size:19px; letter-spacing:1px;
+  background:rgba(var(--paper-rgb),.92); padding:11px 26px;
+  border:1px solid rgba(var(--ink-line),.4); box-shadow:0 2px 10px rgba(0,0,0,.35); }
+.find-code{ display:flex; gap:12px; }
+.find-digit{ width:58px; height:64px; border-radius:0;
+  border:1px solid rgba(var(--ink-line),.5); background:rgba(var(--paper-rgb),.92);
+  color:var(--ink); box-shadow:0 2px 8px rgba(0,0,0,.3);
+  font-family:var(--dlg-font); font-size:30px; line-height:64px; text-align:center; }
+.find-digit.is-on{ border-color:rgba(var(--ink-line),.85); }
 
-.find-pad{ display:grid; grid-template-columns:repeat(3,60px); gap:7px; }
-.find-key{ font-family:var(--dlg-font); font-size:20px; height:42px;
-  background:rgba(30,23,15,.82); color:var(--text);
-  border:1px solid var(--line); border-radius:8px; cursor:pointer; }
-.find-key:active{ border-color:var(--gold); background:rgba(60,46,26,.9); }
+/* 세로 4줄(3열) → 가로 2줄(6열). 세로로 길면 포스터를 키울 자리가 안 나온다. */
+.find-pad{ display:grid; grid-template-columns:repeat(6,1fr); gap:9px;
+  width:100%; max-width:560px; }
+.find-key{ font-family:var(--dlg-font); font-size:21px; height:54px;
+  background:rgba(var(--paper-rgb),.92); color:var(--ink);
+  border:1px solid rgba(var(--ink-line),.35); border-radius:2px; cursor:pointer;
+  box-shadow:0 2px 7px rgba(0,0,0,.3); }
+.find-key:active{ background:rgba(214,204,184,.96); box-shadow:0 1px 3px rgba(0,0,0,.35); }
+/* 지우기 — 숫자와 같은 크기면 글자가 넘친다 */
+.find-key.is-del{ font-size:13px; letter-spacing:1px; color:var(--ink-soft); }
 .find-key.is-blank{ visibility:hidden; }
 
 /* 학습 패널 A₂(활판 인쇄물 스킨) */
@@ -280,23 +337,27 @@ body{
 /* 퀴즈 패널 */
 .quiz-panel{ position:absolute; z-index:45; inset:0; display:flex;
   align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
-.quiz-inner{ width:min(88%,560px); background:linear-gradient(180deg,#241c12,#171009);
-  border:1px solid var(--gold); border-radius:14px; padding:26px 24px; text-align:center; }
-.quiz-q{ font-size:19px; line-height:1.7; margin-bottom:20px; color:var(--paper); }
+.quiz-inner{ width:min(88%,560px); background:var(--paper); color:#241c10;
+  border:2px solid #3a2c14; border-radius:6px; padding:26px 24px; text-align:center;
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+  background-image:repeating-linear-gradient(0deg,transparent 0 30px,rgba(0,0,0,.04) 30px 31px); }
+.quiz-q{ font-size:19px; line-height:1.7; margin-bottom:20px; color:#241c10; }
 .quiz-options{ display:flex; flex-direction:column; gap:10px; }
-.quiz-opt{ font-family:var(--dlg-font); font-size:16px; color:var(--text);
-  background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:10px;
-  padding:14px 16px; cursor:pointer; line-height:1.5; }
+.quiz-opt{ font-family:var(--dlg-font); font-size:16px; color:#241c10;
+  background:rgba(255,255,255,.5); border:1px solid rgba(var(--ink-line),.42);
+  border-radius:2px; padding:14px 16px; cursor:pointer; line-height:1.5; }
 .quiz-opt.ox{ font-size:30px; font-weight:700; padding:16px; width:90px; margin:0 auto; }
-.quiz-opt:active{ border-color:var(--gold); }
-.quiz-opt.correct{ border-color:var(--gold); background:rgba(200,162,74,.18);
-  animation:ding .5s; }
-.quiz-opt.wrong{ border-color:var(--crimson); background:rgba(158,43,37,.18);
+.quiz-opt:active{ background:rgba(var(--ink-line),.1); }
+/* 맞고 틀림은 색으로 남긴다 — 금빛 대신 먹빛(정답)·주홍(오답). 종이 위에서도 또렷하다. */
+.quiz-opt.correct{ border-color:#3a2c14; border-width:2px; background:rgba(58,44,20,.14);
+  font-weight:700; animation:ding .5s; }
+.quiz-opt.wrong{ border-color:var(--crimson); background:rgba(158,43,37,.14);
   animation:shake .4s; }
-@keyframes ding{ 0%{box-shadow:0 0 0 rgba(200,162,74,0)} 50%{box-shadow:0 0 24px rgba(230,200,119,.9)} 100%{box-shadow:0 0 0 rgba(200,162,74,0)} }
+@keyframes ding{ 0%{box-shadow:0 0 0 rgba(58,44,20,0)} 50%{box-shadow:0 0 20px rgba(58,44,20,.55)} 100%{box-shadow:0 0 0 rgba(58,44,20,0)} }
 .ox-row{ display:flex; gap:20px; justify-content:center; }
-.quiz-feedback{ margin-top:18px; font-size:15px; line-height:1.7; color:#e0d6bf;
-  background:rgba(0,0,0,.3); border-radius:10px; padding:14px; text-align:left; }
+.quiz-feedback{ margin-top:18px; font-size:15px; line-height:1.7; color:#3a2c14;
+  background:rgba(58,44,20,.09); border-radius:2px; padding:14px; text-align:left;
+  border-left:3px solid rgba(var(--ink-line),.5); }
 #quiz-continue{ margin-top:18px; }
 
 /* ---------- 도감 ---------- */
@@ -345,7 +406,15 @@ body{
 #settings-close{ width:100%; margin-top:10px; }
 
 /* ---------- ⑤ 결과 ---------- */
-#screen-result{ background:radial-gradient(circle at 50% 30%,#2a2016,#0e0b08); padding:20px; }
+/* ⑤ 결과 화면 배경 = 만세 그림(manse_burst) + 60% 덮개. 사용자 확정 2026-07-18.
+   ⚠️이 자리는 원래 r10_crowd(만세 前 회색 거리) + 82~90% 덮개였다. 만세 그림이 새로
+   나오면서 교체 — 결과 화면은 이야기가 색으로 끝난 뒤라, 같은 거리라도 만세 前이 아니라
+   색이 돌아온 쪽이 시제가 맞는다. 덮개도 60%로 낮춰 붓질·태극기가 어둠 너머로 비치게 한다.
+   ⚠️position은 건드리지 말 것 — .screen의 absolute(화면 전체)를 덮으면
+   상자가 내용 높이만큼만 남아 배경이 중간에서 잘린다. */
+#screen-result{ padding:20px;
+  background:linear-gradient(rgba(14,11,8,.60),rgba(14,11,8,.60)),
+             url('../assets/img/bg/manse_burst.jpg') center/cover no-repeat; }
 .result-heading{ font-family:'kimgu',serif; font-size:26px; color:var(--paper);
   letter-spacing:4px; margin:10px 0 20px; }
 .result-topbtn{ position:absolute; top:16px; right:16px; font-family:var(--dlg-font);
@@ -355,8 +424,10 @@ body{
   max-width:640px; width:100%; }
 .result-cell{ text-align:center; opacity:0; animation:fadein 1.2s forwards; }
 .result-portrait{ aspect-ratio:3/4; border-radius:8px; border:1px solid var(--gold);
-  background:linear-gradient(180deg,#5a6b7a,#8a4a3a); display:flex; align-items:center;
+  background:#1a1510; display:flex; align-items:center; overflow:hidden;
   justify-content:center; color:#fff; font-size:11px; }
+.result-portrait img{ width:100%; height:100%; object-fit:cover; display:block;
+  filter:grayscale(1) contrast(1.05); }
 .result-name{ font-family:'kimgu',serif; color:var(--gold-lite); font-size:14px; margin-top:6px; }
 @keyframes fadein{ to{opacity:1} }
 .result-foot{ display:flex; gap:16px; margin-top:26px; }

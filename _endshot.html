@@ -1,0 +1,67 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>엔딩 화면 점검</title>
+<style>
+  body{margin:0;background:#15130f;color:#e9e3d6;
+    font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif}
+  h1{font-size:19px;padding:18px 22px 4px;margin:0}
+  h2{font-size:16px;padding:14px 22px 2px;margin:0;color:#c9bfa9}
+  .note{padding:0 22px 14px;font-size:14px;color:#a79d8c;line-height:1.7;max-width:1000px}
+  .row{display:flex;gap:22px;padding:0 22px 26px;align-items:flex-start}
+  .col{flex:1;max-width:420px}
+  .cap{font-size:15px;font-weight:600;padding:8px 0}
+  .cap.bad{color:#f0a08c} .cap.good{color:#a8d8a0}
+  .shot{position:relative;width:100%;border:1px solid #3a352c;border-radius:6px;overflow:hidden}
+  .shot img{width:100%;display:block}
+  .mark{position:absolute;left:0;right:0;background:rgba(220,80,60,.2);
+    border-top:2px dashed rgba(240,120,90,.9);border-bottom:2px dashed rgba(240,120,90,.9)}
+  .mark span{position:absolute;left:10px;top:6px;font-size:12px;font-weight:600;
+    color:#ffd9cf;text-shadow:0 1px 4px #000}
+  .hr{height:1px;background:#332e26;margin:6px 22px 12px}
+  b{color:#e9e3d6}
+</style>
+<h1>엔딩 화면 점검</h1>
+
+<h2>① 한용운 필체 — 사진 아래로 내림 (수정 완료)</h2>
+<p class="note">
+  겹침을 없애고 다른 4인과 같은 자리로 옮겼습니다. 한용운 본인의 글씨체와 금빛은 그대로입니다.
+</p>
+<div class="row">
+  <div class="col">
+    <div class="cap bad">수정 전 — 사진 위에 겹쳐 안 읽힘</div>
+    <div class="shot"><img src="_shot/han.png" alt=""></div>
+  </div>
+  <div class="col">
+    <div class="cap good">수정 후 — 사진 아래, 또렷함</div>
+    <div class="shot"><img src="_shot/han2.png" alt=""></div>
+  </div>
+  <div class="col">
+    <div class="cap">비교용 — 윤동주 (원래 이 방식)</div>
+    <div class="shot"><img src="_shot/yun2.png" alt=""></div>
+  </div>
+</div>
+
+<div class="hr"></div>
+<h2>⑤ "아래 절반이 비어 있다"는 게 이 부분입니다</h2>
+<p class="note">
+  붉게 칠한 구간이 <b>배경만 남은 빈 공간</b>입니다. 인물 덩어리가 화면 가운데보다 위에 몰려 있어서 생깁니다.<br>
+  <b>사진 크기는 그대로 두기로 하셨으니 이건 문제가 아닐 수도 있습니다.</b>
+  덩어리를 한가운데로 내리면 위아래가 비슷해지고, 지금처럼 두면 대사창과 멀어져 사진에 더 집중됩니다.
+</p>
+<div class="row">
+  <div class="col">
+    <div class="cap">한용운</div>
+    <div class="shot">
+      <img src="_shot/han2.png" alt="">
+      <div class="mark" style="top:60%;height:29%"><span>배경만 남은 구간</span></div>
+    </div>
+  </div>
+  <div class="col"></div><div class="col"></div>
+</div>
+
+<div class="hr"></div>
+<h2>③ 아직 안 고친 것 — 자막이 어색하게 끊김</h2>
+<p class="note">
+  두 화면 모두 맨 아래 설명이 <b>"…바탕으로 제 / 작되었습니다"</b>로 쪼개집니다.
+  <b>8번(편지글 줄바꿈)</b>과 같은 성격이라, 어디서 끊을지 함께 정하겠습니다.
+</p>

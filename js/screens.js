@@ -70,7 +70,7 @@
 
     // 배경: 만세 물결(색) 유지
     $('stage').classList.remove('fx-tense', 'fx-blur', 'fx-vignette');
-    $('bg').classList.add('color');
+    $('bg').classList.remove('hold');   // 엔딩은 폭발 뒤 = 눌러둔 것이 이미 풀린 상태
 
     const narr = (S['ending.narration'] || '').split('\n').filter(Boolean);
     const theme = (S['ending.theme_close'] || '').split('\n').filter(Boolean);
@@ -97,17 +97,21 @@
       // 자막은 자리만 잡고 투명 — 리빌 때 나타나도 초상이 밀리지 않게.
       const photo = photoOf[row.person];
       // 필적 자막 — 게임 중 화면에 떴던 편지 문구를 그 사람 필체 그대로(ending.script).
-      // 이름과 필체가 처음 나란히 놓이는 자리 = 반전 회수. 한용운만 초상 위 겹침(han-script)
-      // 으로 따로 구현돼 있어 script가 비어 있다.
-      const script = row.script
-        ? '<div class="scriptcap ' + (row.script_font || '') + '">' + row.script + '</div>'
+      // 이름과 필체가 처음 나란히 놓이는 자리 = 반전 회수.
+      // 한용운도 다른 4인과 같은 자리(사진 아래)에 필적을 놓는다. 예전엔 혼자만 사진 위에
+      // 겹쳤는데, 그건 '이름 자막이 없는 대신 필체가 정체를 밝힌다'는 설계였다. 이름 자막을
+      // 열 명 모두에게 넣기로 하면서 그 이유가 사라졌다(사용자 확정).
+      // ※문구가 코드에 박혀 있다 — 나머지 4인처럼 ending.script로 옮기는 게 맞다(원고 작업 때).
+      const scriptText = row.script || (isHan ? '자유는 만유의 생명이요…' : '');
+      const scriptFont = row.script_font || (isHan ? 'han' : '');
+      const script = scriptText
+        ? '<div class="scriptcap ' + scriptFont + '">' + scriptText + '</div>'
         : '';
       pLayer.innerHTML =
         '<div class="montage-group">' +
         '  <div class="namecap"></div>' +
         '  <div class="montage-portrait">' +
         (photo ? '<img src="' + photo + '" alt="">' : '') +
-        (isHan ? '<div class="han-script">자유는 만유의 생명이요…</div>' : '') +
         '  </div>' +
         script +
         '  <div class="tokencap"></div>' +
@@ -119,12 +123,11 @@
       // ── ② 리빌 ── 절이 완성되는 '그 순간'. 탭을 기다리지 않는다.
       if (!isHan) {
         if (phrases[i]) await type2(phrases[i], 'narr');
-        grp.querySelector('.namecap').textContent = row.name_caption || '';
       } else {
-        // 한용운: 이름 자막 없음(L2 필체 겹침이 정체를 대신 밝힌다)
         await type2(narr[3] || '', 'narr'); // "그들이 건넨 것은…"
-        port.querySelector('.han-script').classList.add('show');
       }
+      // 이름 자막은 열 명 모두(한용운 포함).
+      grp.querySelector('.namecap').textContent = row.name_caption || '';
       grp.querySelector('.tokencap').textContent = row.caption || '';
       port.classList.add('revived');
       grp.classList.add('named');   // 자막 한 번에 또렷이(타이핑 X = 반전 임팩트)
@@ -142,7 +145,13 @@
     pLayer.innerHTML = '';
     pLayer.classList.add('hidden');
     for (const line of theme) await type(line, 'narr');
+    // 마지막 대사가 끝나자마자 결과 화면이 튀어나와 여운이 없었다(사용자 지적).
+    // 대사창이 먼저 조용히 걷히고 → 한 박자 비운 뒤 → 결과 화면으로 넘긴다.
+    box.classList.add('fading');
+    await sleep(1200);
+    box.classList.remove('fading');
     box.classList.add('hidden');
+    await sleep(1400);          // 배경만 남는 한 박자 = 여운
     if (onDone) onDone();
   };
 
@@ -174,7 +183,12 @@
       const cell = document.createElement('div');
       cell.className = 'result-cell';
       cell.style.animationDelay = (idx * 0.12) + 's';
-      cell.innerHTML = '<div class="result-portrait">' + c['실명'] + '</div>' +
+      // 공식 흑백 사진(엔딩 몽타주와 같은 에셋). 예전엔 여기에 이름 글자가 들어가
+      // 이름이 두 번 나왔다 — 사진 배선이 몽타주에만 돼 있었다.
+      const photo = c['뒷면_공식이미지_img'];
+      cell.innerHTML =
+        '<div class="result-portrait">' +
+        (photo ? '<img src="' + photo + '" alt="">' : c['실명']) + '</div>' +
         '<div class="result-name">' + c['실명'] + '</div>';
       grid.appendChild(cell);
     });

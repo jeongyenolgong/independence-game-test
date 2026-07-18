@@ -1,0 +1,121 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>UI 샘플</title>
+<style>
+  @font-face{font-family:'han';src:url('assets/font/han.woff2') format('woff2');font-display:swap}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:900px;height:1400px;overflow:hidden;position:relative;
+    font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif}
+  .bg{position:absolute;inset:0;background:url('assets/img/bg/r01_market.jpg') center/cover}
+  .wrap{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:20px;padding-bottom:150px}
+
+  /* 포스터 자리 — 78px → 150px */
+  .slots{display:flex;gap:14px;align-items:flex-end}
+  .slot{width:150px;aspect-ratio:1024/1536;overflow:hidden;
+    display:flex;align-items:center;justify-content:center}
+  .slot img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* 입력칸 3자리 */
+  .code{display:flex;gap:12px}
+  .digit{width:58px;height:64px;display:flex;align-items:center;justify-content:center;
+    font-size:30px;letter-spacing:0}
+
+  /* 키패드 — 세로 4줄 → 가로 2줄 */
+  .pad{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;width:560px}
+  .key{height:54px;font-size:21px;cursor:default;display:flex;
+    align-items:center;justify-content:center;font-family:inherit}
+  .key.del{font-size:13px;letter-spacing:1px}
+
+  .prompt{font-size:17px;letter-spacing:1px}
+  .dlg{position:absolute;left:0;right:0;bottom:0;padding:26px 30px 30px;font-size:22px;line-height:1.6}
+  .tag{position:absolute;top:16px;left:20px;font:600 15px/1 sans-serif;
+    background:#000;color:#fff;padding:7px 13px;border-radius:4px;letter-spacing:1px}
+
+/* ══════════ A안 · 한지 전단 ══════════ */
+body.a .slot{border-radius:2px;box-shadow:0 3px 14px rgba(0,0,0,.5)}
+body.a .slot.empty{background:rgba(238,230,213,.82);border:1px solid rgba(60,48,34,.45);
+  box-shadow:0 3px 14px rgba(0,0,0,.35)}
+body.a .slot.empty::after{content:'?';color:rgba(60,48,34,.5);font-size:34px}
+body.a .prompt{color:#2b2118;background:rgba(238,230,213,.9);padding:9px 20px;
+  border:1px solid rgba(60,48,34,.4);box-shadow:0 2px 10px rgba(0,0,0,.35)}
+body.a .digit{background:rgba(238,230,213,.92);border:1px solid rgba(60,48,34,.5);
+  color:#2b2118;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+body.a .key{background:rgba(238,230,213,.92);border:1px solid rgba(60,48,34,.35);
+  color:#2b2118;border-radius:2px;box-shadow:0 2px 7px rgba(0,0,0,.3)}
+body.a .key.del{color:#6b5a44}
+body.a .dlg{background:rgba(238,230,213,.95);color:#231a12;
+  border-top:2px solid rgba(60,48,34,.55)}
+
+/* ══════════ A2안 · 한지 + 어두운 대사창 ══════════ */
+body.a2 .slot{border-radius:2px;box-shadow:0 3px 14px rgba(0,0,0,.5)}
+body.a2 .slot.empty{background:rgba(238,230,213,.82);border:1px solid rgba(60,48,34,.45);
+  box-shadow:0 3px 14px rgba(0,0,0,.35)}
+body.a2 .slot.empty::after{content:'?';color:rgba(60,48,34,.5);font-size:34px}
+body.a2 .prompt{color:#2b2118;background:rgba(238,230,213,.92);padding:11px 26px;
+  border:1px solid rgba(60,48,34,.4);box-shadow:0 2px 10px rgba(0,0,0,.35);font-size:19px}
+body.a2 .digit{background:rgba(238,230,213,.92);border:1px solid rgba(60,48,34,.5);
+  color:#2b2118;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+body.a2 .key{background:rgba(238,230,213,.92);border:1px solid rgba(60,48,34,.35);
+  color:#2b2118;border-radius:2px;box-shadow:0 2px 7px rgba(0,0,0,.3)}
+body.a2 .key.del{color:#6b5a44}
+body.a2 .dlg{background:rgba(14,12,10,.9);color:#f2ede2;
+  border-top:1px solid rgba(226,220,208,.28)}
+
+/* ══════════ B안 · 흐린 유리 ══════════ */
+body.b .slot{border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+body.b .slot.empty{background:rgba(20,18,15,.34);backdrop-filter:blur(7px);
+  border:1px solid rgba(232,226,214,.34)}
+body.b .slot.empty::after{content:'?';color:rgba(232,226,214,.5);font-size:34px}
+body.b .prompt{color:#efe9dd;text-shadow:0 2px 12px rgba(0,0,0,.9)}
+body.b .digit{background:rgba(18,16,13,.45);backdrop-filter:blur(9px);
+  border:1px solid rgba(232,226,214,.32);border-radius:6px;color:#efe9dd}
+body.b .key{background:rgba(18,16,13,.42);backdrop-filter:blur(9px);
+  border:1px solid rgba(232,226,214,.26);border-radius:6px;color:#efe9dd}
+body.b .key.del{color:rgba(232,226,214,.62)}
+body.b .dlg{background:rgba(14,12,10,.62);backdrop-filter:blur(11px);color:#f0ebe1;
+  border-top:1px solid rgba(232,226,214,.24)}
+
+/* ══════════ C안 · 먹 목판 ══════════ */
+body.c .slot{box-shadow:0 4px 16px rgba(0,0,0,.6)}
+body.c .slot.empty{background:rgba(16,14,12,.72);border:2px solid rgba(226,220,208,.5)}
+body.c .slot.empty::after{content:'?';color:rgba(226,220,208,.55);font-size:34px}
+body.c .prompt{color:#e8e2d6;background:rgba(14,12,10,.85);padding:9px 22px;
+  border-left:3px solid #e8e2d6}
+body.c .digit{background:rgba(14,12,10,.85);border:2px solid rgba(226,220,208,.55);color:#f2ede2}
+body.c .key{background:rgba(14,12,10,.85);border:1px solid rgba(226,220,208,.4);color:#ece6da}
+body.c .key.del{color:rgba(226,220,208,.6)}
+body.c .dlg{background:rgba(12,10,8,.92);color:#f2ede2;
+  border-top:3px solid rgba(226,220,208,.5)}
+</style>
+<div class="bg"></div>
+<div class="wrap">
+  <div class="slots">
+    <div class="slot"><img src="assets/img/poster/r01_r_yugwansun.jpg" alt=""></div>
+    <div class="slot"><img src="assets/img/poster/r01_r_yugwansun.jpg" alt=""></div>
+    <div class="slot empty"></div>
+  </div>
+  <p class="prompt">포스터에서 찾은 번호를 입력하시오</p>
+  <div class="code"><span class="digit">9</span><span class="digit">0</span><span class="digit"></span></div>
+  <div class="pad" id="pad"></div>
+</div>
+<p class="dlg">"장터를 돌다 보면, 흰 무명 저고리에 댕기를 곱게 드린 소녀를 보게 될 거요."</p>
+<div class="tag" id="tag"></div>
+<script>
+  const v = new URLSearchParams(location.search).get('v') || 'a';
+  document.body.className = v;
+  document.getElementById('tag').textContent =
+    ({a:'A안 · 한지 전단', a2:'A2안 · 한지 + 어두운 대사창', b:'B안 · 흐린 유리', c:'C안 · 먹 목판'})[v];
+  if (new URLSearchParams(location.search).get('top') === '1') {
+    const wrap = document.querySelector('.wrap');
+    wrap.insertBefore(document.querySelector('.prompt'), wrap.firstChild);
+  }
+  const pad = document.getElementById('pad');
+  ['1','2','3','4','5','6','7','8','9','0','DEL',''].forEach((k) => {
+    const b = document.createElement('div');
+    b.className = 'key' + (k === 'DEL' ? ' del' : '');
+    if (!k) { b.style.visibility = 'hidden'; }
+    b.textContent = k;
+    pad.appendChild(b);
+  });
+</script>

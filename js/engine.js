@@ -9,6 +9,18 @@
 
   const Engine = {};
 
+  // 대사창 높이를 --dlg-h로 흘려보낸다. 초상 층이 이 값만큼 아래를 비워 대사창을 피한다
+  // (고정 여백이면 대사가 긴 인물에서만 초상이 파묻혔다 — 사용자 지적).
+  function watchDialogueHeight() {
+    const box = $('dialogue-box'), st = $('stage');
+    if (!box || !st || typeof ResizeObserver === 'undefined') return;
+    const sync = () => st.style.setProperty('--dlg-h',
+      (box.classList.contains('hidden') ? 0 : box.offsetHeight) + 'px');
+    new ResizeObserver(sync).observe(box);
+    new MutationObserver(sync).observe(box, { attributes: true, attributeFilter: ['class'] });
+    sync();
+  }
+
   // ---------- 초상 층(D 반전용) ----------
   // 코드로 찾아낸 정답 포스터가 ◯-2 반전 장면 내내 서 있다. 이름은 여기서 밝히지
   // 않는다(screen_spec 【D】 — 실명은 ◯-4 인물 맞히기에서 처음 공개).
@@ -40,10 +52,17 @@
     if (t.includes('blur')) st.classList.add('fx-blur');
     if (t.includes('비네트')) st.classList.add('fx-vignette');
     if (t.includes('긴장')) st.classList.add('fx-tense');
-    // 색부활(초상 흑백→금빛)은 폐기 — 포스터가 처음부터 컬러라 켤 대상이 없다.
-    // 15-5 '색부활(예열)'만 살아남았다: 만세 직전 인파 위로 번지는 옅은 색.
-    if (t.includes('색부활') && t.includes('예열')) bg.classList.add('color');
-    if (t.includes('폭발')) { st.classList.remove('fx-tense', 'fx-blur'); bg.classList.add('burst'); }
+    // 색부활은 전부 폐기 — 배경이 흑백 목판에서 유화 컬러로 바뀌면서 '색이 돌아온다'는
+    // 전제가 사라졌다(포스터도 처음부터 컬러). 대신 뒤집어서 '폭발 전까지 눌러둔다':
+    // 15-5부터 배경이 서서히 색을 잃고 어두워지다가, 만세에서 제 색으로 터진다(사용자 확정).
+    if (t.includes('색부활') && t.includes('예열')) bg.classList.add('hold');
+    // 만세 = 서서히 밝아짐. 예전의 암전(#bg-flash)은 유화 배경과 따로 놀아 삭제했다.
+    // 만세 그림이 어둠에서 제 밝기로 떠오르는 것 하나로 간다(CSS .bg.burst).
+    if (t.includes('폭발')) {
+      bg.classList.remove('hold');          // 눌러둔 것을 풀며 그림이 떠오른다
+      st.classList.remove('fx-tense', 'fx-blur');
+      bg.classList.remove('burst'); void bg.offsetWidth; bg.classList.add('burst');
+    }
   }
 
   // ---------- 무대 세팅 = 배경 그림 ----------
@@ -52,6 +71,15 @@
   function setStaging(sceneId) {
     const stg = (window.G.data.staging || {})[sceneId] || {};
     const bg = $('bg');
+    const prev = $('bg-prev');
+    // 디졸브 — 그림이 실제로 '바뀔 때'만. 같은 배경이 이어지는 장면(◯-1→◯-2→◯-3)에서
+    // 매번 겹쳐 지우면 이유 없이 화면이 깜빡인다.
+    const before = bg.style.getPropertyValue('--bg-img');
+    const after = stg.bg_img ? 'url("' + new URL(stg.bg_img, document.baseURI).href + '")' : '';
+    if (prev && before && before !== after) {
+      prev.style.backgroundImage = before;
+      prev.classList.remove('is-fading'); void prev.offsetWidth; prev.classList.add('is-fading');
+    }
     if (stg.bg_img) {
       // ⚠️CSS 변수에 상대경로를 넣으면 style.css 기준으로 풀려 'css/assets/...'를 찾는다
       // (파일이 멀쩡해도 배경이 새까맣게 뜬다). 게다가 배포본 /el/ /md/는 <base href="../">를
@@ -370,9 +398,11 @@
 
     function buildPad() {
       pad.innerHTML = '';
-      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '←'].forEach((k) => {
+      // 확인 버튼은 없다 — 세 자리째에서 자동 판정된다. 'DEL'은 지우기(←는 입력으로 오읽힘).
+      // 가로 6열 2줄 — 1~6 / 7~0·DEL·빈칸. 세로로 길면 포스터 자리를 키울 여백이 안 남는다.
+      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'DEL', ''].forEach((k) => {
         const b = document.createElement('button');
-        b.className = 'find-key' + (k ? '' : ' is-blank');
+        b.className = 'find-key' + (k ? '' : ' is-blank') + (k === 'DEL' ? ' is-del' : '');
         b.textContent = k;
         if (!k) { b.disabled = true; pad.appendChild(b); return; }
         b.onclick = (e) => { e.stopPropagation(); press(k); };
@@ -391,7 +421,7 @@
     }
     function press(k) {
       if (busy) return;
-      if (k === '←') { typed = typed.slice(0, -1); renderCode(); return; }
+      if (k === 'DEL') { typed = typed.slice(0, -1); renderCode(); return; }
       if (typed.length >= 3) return;
       typed += k;
       renderCode();
@@ -429,16 +459,18 @@
       // ① 이 장면 정답 = 얼굴 삽입 → 다음
       const o = hit.opt;
       const correct = (o.type === '정답') || (o.result && String(o.result).includes('반전'));
-      if (!filled.has(hitCode)) { fillSlot(o, correct); filled.add(hitCode); }
+      // ① 정답 = 작은 자리를 거치지 않고 곧장 큰 초상으로.
+      //    예전엔 여기서도 fillSlot으로 슬롯에 한 번 꽂고 700ms 보여준 뒤 초상을 띄웠는데,
+      //    같은 그림이 작게 번쩍했다 커지는 게 잔상으로 읽혔다(사용자 지적).
       if (correct) {
         $('dialogue-box').classList.add('hidden');
-        await pause(700);           // 찾아낸 얼굴을 보는 한 박자
         layer.classList.add('hidden');
         lock(false);
         showPortrait(o);            // ◯-2 반전 장면 내내 서 있는다
         if (onDone) onDone();
         return;
       }
+      if (!filled.has(hitCode)) { fillSlot(o, false); filled.add(hitCode); }
       // ② 이 장면 오답 = 얼굴 삽입 → 기존 오답 대사 → 묘사 복귀
       if (o.response) await typewriter(o.response, o.type === '위험' ? 'emph' : 'narr');
       showStatic(hint);
@@ -545,4 +577,7 @@
   Engine.typeAuto = typeAuto;
   Engine.identityQuiz = identityQuiz;   // 미리보기/테스트용 노출
   window.Engine = Engine;
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', watchDialogueHeight);
+  else watchDialogueHeight();
 })();

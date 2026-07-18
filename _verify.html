@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <base href="../">
-  <script>window.__GRADE = "el";</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>만세는 언제 부르오</title>
@@ -27,6 +25,8 @@
     <!-- 앞 배경이 남아 사라지는 층(디졸브). 새 배경은 #bg에 즉시 깔리고, 이 층이 그 위에서
          옛 그림을 들고 서서히 지워진다 — background-image는 transition이 안 먹으므로. -->
     <div id="bg-prev" class="bg-prev"></div>
+    <!-- 만세 암전·폭발 층. 배경 그림을 지우지 않고 그 위에서만 논다. -->
+    <div id="bg-flash" class="bg-flash"></div>
 
     <!-- 미니메뉴 (우상단) -->
     <div id="minimenu">
@@ -144,5 +144,21 @@
 <script src="js/engine.js"></script>
 <script src="js/screens.js"></script>
 <script src="js/main.js"></script>
-</body>
+
+<script>
+window.addEventListener('load', async () => {
+  const res=await fetch('data/game.json'); window.G.data=await res.json();
+  window.G.grade='초등';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('stage').classList.remove('hidden');
+  const bg=document.getElementById('bg');
+  bg.style.setProperty('--bg-img','url("'+new URL('assets/img/bg/r10_crowd.jpg',document.baseURI).href+'")');
+  bg.classList.add('has-img');
+  const q=new URLSearchParams(location.search);
+  if(q.get('hold')==='1'){ bg.style.transition='none'; bg.classList.add('hold'); }
+  document.getElementById('dialogue-box').classList.remove('hidden');
+  document.getElementById('dialogue-text').textContent =
+    q.get('hold')==='1' ? '"기미년 삼월 1일, 바로 지금이오!"  ← 직전(눌러둔 상태)' : '폭발 직후(제 색)';
+});
+</script></body>
 </html>
