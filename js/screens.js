@@ -38,7 +38,9 @@
       card.className = 'codex-card' + (unlocked ? '' : ' locked');
       card.innerHTML =
         '<div class="codex-card-inner">' +
-        '  <div class="codex-face codex-front"><p class="quote">' + (unlocked ? '“' + c['대표한마디'] + '”' : '') + '</p></div>' +
+        '  <div class="codex-face codex-front">' +
+        (unlocked && c['앞면_초상_img'] ? '<img class="codex-portrait" src="' + c['앞면_초상_img'] + '" alt="">' : '') +
+        '    <p class="quote">' + (unlocked ? '“' + c['대표한마디'] + '”' : '') + '</p></div>' +
         '  <div class="codex-face codex-back">' +
         '    <div class="cname">' + name + '</div>' +
         '    <div class="cinfo">' + (c['한자'] || '') + '<br>' + (c['생몰년'] || '') + '<br><br>' + (c['한줄'] || '') + '</div>' +
