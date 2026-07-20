@@ -49,6 +49,12 @@
       if (unlocked) card.onclick = () => card.classList.toggle('flipped');
       grid.appendChild(card);
     });
+    // 도감 배경 = 지금 서 있는 장면의 배경. 검은 단색이면 도감이 게임 밖 별도 화면처럼
+    // 뚝 떨어졌다 — 도감은 '가던 길에 잠깐 펼쳐 보는 수첩'이라 그 자리가 비쳐야 한다.
+    // #bg의 --bg-img를 그대로 빌려 온다(경로는 engine.setStaging이 이미 절대주소로 박아 둠).
+    // 흐림·어둠은 fx.css가 입힌다. 배경이 아직 없는 장면이면 none → 지금처럼 검정.
+    $('screen-codex').style.setProperty(
+      '--codex-bg', $('bg').style.getPropertyValue('--bg-img') || 'none');
     Screens._codexFromResult = !!fromResult;
     show('screen-codex');
   };
@@ -82,8 +88,14 @@
 
     // 인물 → 공식 흑백 사진 경로. 정본 411행(★공식사진 채택 = 미술 원칙 전환):
     // L1 초상 = 실제 공식사진(도감 뒷면과 같은 에셋 계열). 목판·색부활 아님.
-    const photoOf = {};
-    (window.G.data.cards || []).forEach((c) => { photoOf[c['실명']] = c['뒷면_공식이미지_img']; });
+    // 게임 본편에서 그 사람의 얼굴이었던 유화 포스터(도감 앞면과 같은 그림).
+    // 몽타주는 이 그림에서 시작해 실제 사진으로 건너간다 — 아래 ① 참조.
+    const photoOf = {}, posterOf = {}, tokenOf = {};
+    (window.G.data.cards || []).forEach((c) => {
+      photoOf[c['실명']] = c['뒷면_공식이미지_img'];
+      posterOf[c['실명']] = c['앞면_초상_img'];
+      tokenOf[c['실명']] = c['상징물_필체_img'];
+    });
 
     pLayer.classList.remove('hidden');
     // 도입 내레이션
@@ -109,17 +121,35 @@
       const script = scriptText
         ? '<div class="scriptcap ' + scriptFont + '">' + scriptText + '</div>'
         : '';
+      // 증표 그림 — 남성 5인이 필적으로 채우는 그 자리를, 여성 5인은 건넨 물건으로 채운다.
+      // 목판 SVG를 걷어낼 때 이 자리가 통째로 비면서 "남=편지 / 여=물건" 규칙이 반쪽만
+      // 남아 있었다(여성 칸에 아무것도 안 뜸). 정본 screen_spec 423행 "얼굴=실사 / 증표=상징"의
+      // 복구. 필적이 있는 사람에겐 안 넣는다 — 한 자리에 둘이 겹치지 않게.
+      const tokenImg = scriptText ? '' : tokenOf[row.person];
+      const token = tokenImg
+        ? '<div class="tokenimg"><img src="' + tokenImg + '" alt=""></div>'
+        : '';
+      // ① 유화 포스터 → 실제 사진 크로스페이드.
+      //    게임 내내 이 사람의 얼굴은 그림이었다. 리빌 순간 그 그림이 걷히고 진짜 얼굴이
+      //    남는다 = '이야기 속 인물'에서 '실제로 살았던 사람'으로 건너가는 이음매.
+      //    포스터를 .montage-portrait 밖(형제)에 겹치는 이유: 안에 넣으면 그 상자의
+      //    filter:grayscale(1)에 걸려 유화까지 흑백이 된다. 색이 빠지는 것이 연출의 핵심이다.
+      const poster = posterOf[row.person];
       pLayer.innerHTML =
         '<div class="montage-group">' +
         '  <div class="namecap"></div>' +
-        '  <div class="montage-portrait">' +
+        '  <div class="mp-stack">' +
+        '    <div class="montage-portrait">' +
         (photo ? '<img src="' + photo + '" alt="">' : '') +
+        '    </div>' +
+        (poster ? '<img class="mp-poster" src="' + poster + '" alt="">' : '') +
         '  </div>' +
-        script +
+        script + token +
         '  <div class="tokencap"></div>' +
         '</div>';
       const grp = pLayer.querySelector('.montage-group');
       const port = grp.querySelector('.montage-portrait');
+      const stack = grp.querySelector('.mp-stack');
       cLayer.classList.add('hidden');   // 몽타주는 캡션층을 안 쓴다(장소 자막 전용)
 
       // ── ② 리빌 ── 절이 완성되는 '그 순간'. 탭을 기다리지 않는다.
@@ -132,9 +162,12 @@
       grp.querySelector('.namecap').textContent = row.name_caption || '';
       grp.querySelector('.tokencap').textContent = row.caption || '';
       port.classList.add('revived');
+      stack.classList.add('to-photo');   // 유화가 걷히고 실제 사진이 남는다(1.2초)
       grp.classList.add('named');   // 자막 한 번에 또렷이(타이핑 X = 반전 임팩트)
 
-      await waitTapAfter(700);   // 리빌 착지 여음 뒤 탭 = 다음 인물
+      // 700ms였다. 크로스페이드(1.2초)가 다 넘어가기 전에 탭이 먹으면 그림이 걷히다 만
+      // 채로 다음 인물로 넘어가, 이 연출이 아예 안 보인다 → 페이드가 끝난 뒤로 미룬다.
+      await waitTapAfter(1300);   // 리빌 착지 여음 뒤 탭 = 다음 인물
 
       // ── ③ 스쳐 지나감 ── 금빛이 스러지며 왼쪽 아래 물결로 흘러 군중에 섞인다.
       // 사진이 흑백이라 금빛만 빠지면 군중과 동일 톤 = 다시 익명(screen_spec:405).

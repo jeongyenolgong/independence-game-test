@@ -17,7 +17,14 @@
     <div class="title-inner">
       <h1 class="logo-main" data-k="title.logo_main">만세는 언제 부르오</h1>
       <p class="logo-sub" data-k="title.logo_sub">10인의 독립운동가</p>
-      <button id="btn-start" class="btn-primary">시작하기</button>
+      <!-- 암구호를 통과해야 시작된다. 검사는 js/ui.js — main.js의 시작 핸들러는 그대로 두고
+           클릭을 가로채는 방식이라, 다른 창이 main.js를 고쳐도 서로 부딪히지 않는다. -->
+      <div class="gate">
+        <input id="gate-code" class="gate-input" type="text" inputmode="text"
+               placeholder="암구호를 입력하세요" autocomplete="off"
+               autocapitalize="off" spellcheck="false" maxlength="20">
+        <button id="btn-start" class="btn-primary">확인</button>
+      </div>
     </div>
   </section>
 
@@ -141,8 +148,12 @@
 
 </div>
 
+<!-- 도감 저장(PDF)용. 로컬 번들 — 오프라인 교실에서도 돌아야 하므로 CDN 쓰지 않는다 -->
+<script src="lib/html2canvas.min.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/screens.js"></script>
 <script src="js/main.js"></script>
+<script src="js/ui.js"></script>
 </body>
 </html>

@@ -9,6 +9,16 @@
 
   const Engine = {};
 
+  // 연출 보강 CSS(fx.css)를 여기서 끼운다. index.html·style.css를 건드리지 않고
+  // 덮어쓰기 위한 층이라, style.css 뒤에 붙는 것이 조건 — <head> 끝에 넣으면 항상 뒤다.
+  // 상대경로는 document.baseURI 기준으로 풀리므로 배포본(/el/ /md/의 <base href="../">)도 맞는다.
+  (function loadFx() {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = 'css/fx.css';
+    document.head.appendChild(l);
+  })();
+
   // 대사창 높이를 --dlg-h로 흘려보낸다. 초상 층이 이 값만큼 아래를 비워 대사창을 피한다
   // (고정 여백이면 대사가 긴 인물에서만 초상이 파묻혔다 — 사용자 지적).
   function watchDialogueHeight() {
@@ -63,6 +73,30 @@
       st.classList.remove('fx-tense', 'fx-blur');
       bg.classList.remove('burst'); void bg.offsetWidth; bg.classList.add('burst');
     }
+  }
+
+  // ---------- 암전 → 밝아짐(여운) ----------
+  // 정답을 맞힌 순간 곧장 초상이 튀어나오면 '맞았다'는 사실만 남고 여운이 없었다.
+  // 화면을 한 번 재웠다가 다시 밝히고, 그 어둠 속에서 포스터를 세워 둔다
+  // → 빛이 돌아올 때 사람이 이미 서 있다. during()이 어둠 한가운데에서 호출된다.
+  async function blackout(during) {
+    const st = $('stage');
+    let v = $('fx-blackout');
+    if (!v) {
+      v = document.createElement('div');
+      v.id = 'fx-blackout';
+      v.className = 'fx-blackout';
+      st.appendChild(v);
+    }
+    v.classList.remove('is-in', 'is-out'); void v.offsetWidth;
+    v.classList.add('is-in');
+    await pause(900);          // 잠긴다
+    if (during) during();      // 어둠 속에서 화면을 갈아 끼운다
+    await pause(500);          // 완전한 어둠 한 박자
+    v.classList.remove('is-in'); void v.offsetWidth;
+    v.classList.add('is-out');
+    await pause(1500);         // 서서히 밝아진다
+    v.classList.remove('is-out');
   }
 
   // ---------- 무대 세팅 = 배경 그림 ----------
@@ -216,6 +250,68 @@
     });
   }
 
+  // ---------- 증표 클로즈업(전체화면) ----------
+  // 남성은 편지를 건네고(→letterFull 전체화면), 여성은 물건을 건넨다. 원고가 그 순간
+  // "클로즈업"을 지시하는데 화면엔 아무것도 안 떴다 — 편지만 전체화면을 받고 물건은
+  // 아무 자리도 못 받는, 엔딩에서 고친 것과 똑같은 기울기가 릴레이에도 남아 있었다.
+  // 그래서 letterFull과 **같은 층위**로 만든다: 전체화면 + 탭으로 넘기는 한 박자.
+  // (applyFx는 동기라 탭 대기가 없어 여기 쓸 수 없다.)
+
+  // 실명 → 증표 그림. cards.상징물_필체_img는 여성=물건 / 남성=편지가 함께 쓰는 칸이라,
+  // 남성 5인은 비어 있다(필체 폰트가 이미 시각물이므로 그림이 필요 없다).
+  let TOKENS = null;
+  function tokenSrc(name) {
+    if (!TOKENS) {
+      TOKENS = {};
+      (window.G.data.cards || []).forEach((c) => {
+        if (c['상징물_필체_img']) TOKENS[c['실명']] = c['상징물_필체_img'];
+      });
+    }
+    return TOKENS[name] || '';
+  }
+
+  // fx 칸의 '증표:유관순' → '유관순'. 앞의 사람이 건넨 물건이므로 **주는 쪽** 이름이다
+  // (8-3은 윤동주에게 건네지만 물건은 유관순의 태극기).
+  function tokenOwner(fx) {
+    const m = /증표\s*[:：]\s*([^\s,·]+)/.exec(String(fx || ''));
+    return m ? m[1] : '';
+  }
+
+  // index.html은 다른 작업이 함께 쓰는 파일이라 건드리지 않는다. fx.css를 <head>에
+  // 끼우는 것과 같은 방식으로 층을 코드에서 만들어 세운다.
+  function tokenLayer() {
+    let layer = $('token-layer');
+    if (layer) return layer;
+    layer = document.createElement('div');
+    layer.id = 'token-layer';
+    layer.className = 'token-layer hidden';
+    layer.innerHTML = '<div class="token-frame"><img id="token-img" alt=""></div>' +
+      '<span class="token-cont cont-indicator">▼</span>';
+    $('stage').appendChild(layer);
+    return layer;
+  }
+
+  function tokenFull(src) {
+    return new Promise((resolve) => {
+      const layer = tokenLayer(), img = $('token-img'), cont = layer.querySelector('.token-cont');
+      $('dialogue-box').classList.add('hidden');
+      cont.classList.add('hidden');
+      layer.classList.remove('hidden', 'is-in'); void layer.offsetWidth;
+      img.src = new URL(src, document.baseURI).href;
+      layer.classList.add('is-in');
+      // 물건이 다 떠오른 뒤에 ▼를 준다. 타자기가 글자를 다 친 뒤 ▼를 주는 것과 같은 박자.
+      let done = false;
+      const t = setTimeout(() => { done = true; cont.classList.remove('hidden'); }, 1100);
+      function onTap() {
+        if (!done) { clearTimeout(t); done = true; cont.classList.remove('hidden'); return; }
+        $('stage').removeEventListener('click', onTap);
+        layer.classList.add('hidden'); layer.classList.remove('is-in');
+        resolve();
+      }
+      $('stage').addEventListener('click', onTap);
+    });
+  }
+
   function styleFor(line) {
     if (line.kind === '지문') return 'narr';
     if (line.kind === '쪽지' || line.kind === '편지') {
@@ -263,11 +359,18 @@
       }
       // 대사/지문: 최대 3줄을 한 대사창에 모아 이어서 타자기
       const batch = [];
+      let owner = '';
       while (i < lines.length && batch.length < 3 &&
              lines[i].kind !== '학습' && lines[i].kind !== '편지' && lines[i].kind !== '쪽지') {
         batch.push(lines[i]); i++;
+        // '증표:◯◯◯'가 붙은 줄에서 묶음을 끊는다. 안 끊으면 "꺼내 내밀었다"(seq1)와
+        // "두 손으로 받아…"(seq2)가 한 대사창에 묶여, 이미 받은 뒤에 물건이 뜬다.
+        owner = tokenOwner(batch[batch.length - 1].fx);
+        if (owner) break;
       }
       await typeBatch(batch);
+      // 건네는 줄 → 클로즈업 → 받는 줄. 그림이 없는 사람이면 조용히 지나간다.
+      if (owner && tokenSrc(owner)) await tokenFull(tokenSrc(owner));
     }
     $('dialogue-box').classList.add('hidden');
     if (onDone) onDone();
@@ -369,12 +472,13 @@
     const hint = (opts.find((o) => o.type === '정답') || {}).hint || '';
     const index = codeIndex();
     const filled = new Set();   // 이 장면에서 이미 자리를 채운 코드(중복 입력 시 자리 안 늘림)
-    let typed = '', busy = false;
+    let busy = false;
 
     layer.classList.remove('hidden');
+    layer.classList.remove('is-busy');   // 앞 릴레이가 남겼을 수 있는 잠금 상태를 걷고 시작
     clearPortrait();
     $('find-prompt').textContent = L['find.prompt'] || '';
-    buildPad();
+    const input = buildInput();
     resetSlots();
     showStatic(hint);
 
@@ -396,44 +500,56 @@
       if (!last) addEmpty();
     }
 
-    function buildPad() {
+    // 자체 숫자키패드는 걷었다. 기기 자판이 이미 숫자를 칠 줄 알고, 직접 만든 패드는
+    // 화면 아래를 크게 먹으면서 포스터 자리를 눌렀다. 진짜 <input>이라 붙여넣기·백스페이스·
+    // 하드웨어 키보드가 전부 공짜로 따라온다.
+    function buildInput() {
       pad.innerHTML = '';
-      // 확인 버튼은 없다 — 세 자리째에서 자동 판정된다. 'DEL'은 지우기(←는 입력으로 오읽힘).
-      // 가로 6열 2줄 — 1~6 / 7~0·DEL·빈칸. 세로로 길면 포스터 자리를 키울 여백이 안 남는다.
-      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'DEL', ''].forEach((k) => {
-        const b = document.createElement('button');
-        b.className = 'find-key' + (k ? '' : ' is-blank') + (k === 'DEL' ? ' is-del' : '');
-        b.textContent = k;
-        if (!k) { b.disabled = true; pad.appendChild(b); return; }
-        b.onclick = (e) => { e.stopPropagation(); press(k); };
-        pad.appendChild(b);
-      });
-      renderCode();
-    }
-    function renderCode() {
+      pad.classList.add('hidden');   // 자리까지 회수(.hidden = display:none)
       codeEl.innerHTML = '';
-      for (let i = 0; i < 3; i++) {
-        const d = document.createElement('span');
-        d.className = 'find-digit' + (typed[i] ? ' is-on' : '');
-        d.textContent = typed[i] || '';
-        codeEl.appendChild(d);
-      }
+      const el = document.createElement('input');
+      el.className = 'find-input';
+      // type=number는 스피너·e/+/- 입력이 따라와 3자리 코드엔 해가 더 크다.
+      // text + inputmode=numeric = 태블릿에서 숫자 자판이 뜨면서 값은 우리가 통제한다.
+      el.type = 'text';
+      el.inputMode = 'numeric';
+      el.setAttribute('pattern', '[0-9]*');
+      el.autocomplete = 'off';
+      el.maxLength = 3;
+      el.placeholder = L['find.slot_code'] || '···';
+      // 입력칸 위 탭이 무대까지 올라가면 대사 넘기기로도 먹힌다(타자기가 #stage에서 듣는다).
+      ['pointerdown', 'mousedown', 'touchstart', 'click'].forEach((ev) =>
+        el.addEventListener(ev, (e) => e.stopPropagation()));
+      el.addEventListener('input', () => {
+        // 숫자만·3자리까지. 자판·붙여넣기·자동완성 어느 경로로 들어와도 여기서 걸러진다.
+        const v = el.value.replace(/\D/g, '').slice(0, 3);
+        if (v !== el.value) el.value = v;
+        if (busy) return;
+        if (v.length === 3) setTimeout(submit, 180);   // 세 자리째 = 자동 판정(확인 버튼 없음)
+      });
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); if (!busy && el.value.length === 3) submit(); }
+      });
+      codeEl.appendChild(el);
+      return el;
     }
-    function press(k) {
-      if (busy) return;
-      if (k === 'DEL') { typed = typed.slice(0, -1); renderCode(); return; }
-      if (typed.length >= 3) return;
-      typed += k;
-      renderCode();
-      if (typed.length === 3) setTimeout(submit, 180);  // 세 자리째 = 자동 판정(확인 버튼 없음)
-    }
-    function clearCode() { typed = ''; renderCode(); }
+    function clearCode() { input.value = ''; }
 
-    // 대사가 흐르는 동안엔 키패드를 잠근다 — 탭이 대사 넘기기와 겹치므로.
-    function lock(on) { busy = on; layer.classList.toggle('is-busy', on); }
+    // 대사가 흐르는 동안엔 입력을 잠근다 — 탭이 대사 넘기기와 겹치므로.
+    // 잠글 땐 입력칸·안내 문구가 잠시 걷힌다(fx.css .find-layer.is-busy): 대사가 흐르는 중에
+    // 입력칸이 그대로 서 있으면 "지금 쳐도 되나?"로 읽혔다.
+    // refocus=false = 잠금은 풀되 커서는 안 준다(정답 직후 — 자판이 다시 올라오면
+    // 암전 연출을 자판이 가린다). #find-layer는 릴레이 10개가 돌려 쓰는 한 개짜리 층이라
+    // is-busy를 남긴 채 끝내면 **다음 릴레이** 화면이 입력칸도 안내도 안 보이는 채로 열린다.
+    function lock(on, refocus) {
+      busy = on;
+      layer.classList.toggle('is-busy', on);
+      input.disabled = on;
+      if (!on && refocus !== false) input.focus();
+    }
 
     async function submit() {
-      const hitCode = typed;
+      const hitCode = input.value;
       const hit = index.get(hitCode);
 
       // ⑤ 30장 어디에도 없는 번호(오타 등) = 입력칸만 흔들리고 지워짐. 대사 없음.
@@ -465,8 +581,10 @@
       if (correct) {
         $('dialogue-box').classList.add('hidden');
         layer.classList.add('hidden');
-        lock(false);
-        showPortrait(o);            // ◯-2 반전 장면 내내 서 있는다
+        lock(false, false);         // is-busy를 반드시 걷는다(다음 릴레이가 같은 층을 쓴다)
+        // 암전 한 박자를 두고 밝아진다. 초상은 어둠 속에서 세워 두므로,
+        // 빛이 돌아올 땐 그 사람이 이미 서 있다(정답이 '나타나는' 게 아니라 '드러난다').
+        await blackout(() => showPortrait(o));   // ◯-2 반전 장면 내내 서 있는다
         if (onDone) onDone();
         return;
       }

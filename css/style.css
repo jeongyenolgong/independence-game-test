@@ -17,6 +17,23 @@
   --text:#ece3d0; --muted:#a99a7c; --line:#5a4a30;
   --header-h:56px;
   --dlg-font:'typew',"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+
+  /* A2안 「한지 전단」 종이 스킨 — 원래 264행 근처에 따로 있던 것을 여기로 올렸다.
+     조작 UI(버튼·입력칸·팝업)가 전부 이 네 값을 보므로 색의 출발점이 한 군데여야 한다.
+     ⚠️--ink는 위에서 이미 '앱 바깥 여백의 거의 검정'이다. 종이 위 글씨색은
+     이름을 나눠 --ink-paper로 둔다(같은 이름을 겹쳐 썼다가 여백까지 갈색이 된 적 있음). */
+  --paper-rgb:238,230,213; --ink-paper:#2b2118; --ink-soft:#6b5a44; --ink-line:60,48,34;
+
+  /* 팝업(학습창·퀴즈) 공통 치수 — 세 팝업이 같은 크기로 서야 해서 한 곳에 둔다.
+     min은 가장 긴 내용(초등 OX 해설 131자 + 해설칸 + 계속 버튼) 기준. */
+  --panel-w:min(88%,560px);
+  /* vh로 잡으면 화면 높이마다 기준이 달라져, 낮은 화면에선 해설이 뜬 OX만 혼자 커진다.
+     그래서 고정값을 기준으로 두고, 화면이 아주 낮을 때만 76vh가 대신 받게 한다. */
+  --panel-min-h:min(480px,76vh);
+
+  /* 글줄 최대 폭. 화면(#app)은 꽉 채우되 읽는 글은 여기서 묶는다.
+     880px = 대사 19px 기준 한 줄 약 40자 — 한글이 편하게 읽히는 길이. */
+  --read-w:880px;
 }
 
 *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
@@ -29,7 +46,11 @@ body{
   background:var(--ink); color:var(--text); font-family:var(--dlg-font);
   overflow:hidden; user-select:none;
 }
-#app{ position:relative; max-width:900px; margin:0 auto; height:100%;
+/* 타깃 = 아이패드 미니 가로(1133×744). 900px로 잠겨 있어 양옆 233px이 검게 남았다
+   (사용자 지적 14). 그림은 화면을 꽉 채우되, 글은 아래 --read-w로 따로 묶는다
+   — 폭을 통째로 풀면 대사가 한 줄에 58자까지 늘어나 읽기 힘들어진다.
+   1600px 상한은 큰 데스크톱에서 그림이 무한정 늘어지지 않게 하는 선. */
+#app{ position:relative; max-width:1600px; margin:0 auto; height:100%;
   box-shadow:0 0 60px rgba(0,0,0,.6); overflow:hidden; }
 
 .hidden{ display:none !important; }
@@ -39,16 +60,26 @@ body{
 .overlay{ position:absolute; inset:0; z-index:60; display:flex;
   align-items:center; justify-content:center; background:rgba(0,0,0,.62); }
 
-/* ---------- 버튼 공통 ---------- */
-.btn-primary{ font-family:var(--dlg-font); font-size:17px; color:#1a140c;
-  background:linear-gradient(180deg,var(--gold-lite),var(--gold));
-  border:none; border-radius:10px; padding:13px 30px; cursor:pointer;
-  box-shadow:0 3px 0 #8a6d28; letter-spacing:2px; }
-.btn-primary:active{ transform:translateY(2px); box-shadow:0 1px 0 #8a6d28; }
-.btn-ghost{ font-family:var(--dlg-font); font-size:16px; color:var(--text);
-  background:transparent; border:1px solid var(--line); border-radius:10px;
-  padding:12px 26px; cursor:pointer; letter-spacing:2px; }
-.btn-ghost:active{ background:rgba(255,255,255,.05); }
+/* ---------- 버튼 공통 ----------
+   A2안 「한지 전단」으로 교체(사용자 확정 2026-07-20). 예전엔 금빛 그라데이션 +
+   둥근 모서리 10px였는데, 조작 UI는 이미 선택지·키패드·퀴즈 선택지가 전부 종이·먹으로
+   가 있었고 이 표준 버튼만 옛 금빛으로 남아 혼자 떠 보였다.
+   이 규칙 하나가 시작(확인)·설정닫기·계속·저장·종료 다섯 버튼을 동시에 바꾼다. */
+.btn-primary{ font-family:var(--dlg-font); font-size:17px; letter-spacing:2px;
+  color:var(--ink-paper); background:rgba(var(--paper-rgb),.93);
+  border:1px solid rgba(var(--ink-line),.45); border-radius:2px;
+  padding:13px 30px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.35); }
+.btn-primary:active{ background:rgba(214,204,184,.96);
+  box-shadow:0 1px 3px rgba(0,0,0,.35); transform:translateY(1px); }
+/* 종료 버튼용. "저장하기와 똑같은 스타일"이 요구사항이라 크기·색을 완전히 맞추고,
+   테두리만 한 톤 진하게 해 주/보조가 구분되게 둔다(예전 btn-ghost는 투명 배경이라
+   결과 화면에서 혼자 색이 빠져 보였다). */
+.btn-ghost{ font-family:var(--dlg-font); font-size:17px; letter-spacing:2px;
+  color:var(--ink-paper); background:rgba(var(--paper-rgb),.93);
+  border:1px solid rgba(var(--ink-line),.45); border-radius:2px;
+  padding:13px 30px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.35); }
+.btn-ghost:active{ background:rgba(214,204,184,.96);
+  box-shadow:0 1px 3px rgba(0,0,0,.35); transform:translateY(1px); }
 
 /* ---------- ① 타이틀 ---------- */
 /* 배경 = 동트기 전 저잣길(title_dawn). ⚠️상대경로는 이 css 파일 기준으로 풀린다
@@ -61,9 +92,27 @@ body{
   background:radial-gradient(115% 85% at 50% 46%,
     rgba(14,11,8,.74) 0%, rgba(14,11,8,.40) 42%, rgba(14,11,8,.78) 100%); }
 .title-inner{ position:relative; z-index:1; text-align:center; }
-.logo-main{ font-family:'kimgu',serif; font-size:52px; color:var(--paper);
+.logo-main{ font-family:'kimgu',serif; font-size:clamp(34px,7vh,56px); color:var(--paper);
   letter-spacing:6px; margin-bottom:10px; text-shadow:0 2px 12px #000; }
-.logo-sub{ color:var(--gold); letter-spacing:8px; margin-bottom:44px; font-size:15px; }
+/* 부제 — 금색·자간 8px이었다. 제목이 붓글씨라 그 아래 금색 타자기체가 겉돌았고(사용자 지적),
+   게임 전체가 종이색으로 통일되면서 첫 화면만 금색으로 남을 이유가 없어졌다.
+   붓글씨로 같이 가지 않는 이유: 제목과 같은 서체를 겹쳐 쓰면 제목이 눌린다.
+   담백한 타자기체는 두되 색을 종이색으로 내리고, 자간을 8px→4px로 좁혀 한 덩어리로 읽히게 한다. */
+.logo-sub{ color:var(--paper2); letter-spacing:4px; margin-bottom:34px; font-size:15px;
+  opacity:.85; text-shadow:0 1px 8px #000; }
+
+/* 시작 암구호 — 이 칸을 통과해야 게임이 열린다(사용자 확정 2026-07-20).
+   조작 UI라 코드 입력 키패드·선택지와 같은 종이 언어를 쓴다. */
+.gate{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+.gate-input{ font-family:var(--dlg-font); font-size:17px; letter-spacing:2px;
+  text-align:center; width:min(78vw,290px); padding:13px 16px;
+  color:var(--ink-paper); background:rgba(var(--paper-rgb),.93);
+  border:1px solid rgba(var(--ink-line),.45); border-radius:2px;
+  box-shadow:0 2px 8px rgba(0,0,0,.35); }
+/* 지시문은 흐리게 — 입력한 글자와 헷갈리지 않아야 한다 */
+.gate-input::placeholder{ color:var(--ink-soft); opacity:.75; letter-spacing:1px; }
+.gate-input:focus{ outline:none; border-color:rgba(var(--ink-line),.85); }
+.gate-input.is-wrong{ animation:shake .45s; border-color:var(--crimson); }
 
 /* ---------- 인게임 무대 ---------- */
 #stage{ justify-content:flex-end; }
@@ -82,8 +131,8 @@ body{
   filter:grayscale(1); }
 /* 배경 그림(staging.bg_img) — 깔린 장면에선 위 회색 플레이스홀더·목판 줄무늬를 걷는다.
    아직 안 그려진 장소는 .has-img가 안 붙어 그대로 회색으로 남는다.
-   ⚠️아래 .bg.color(예열)·.bg.burst(만세폭발)가 background를 통째로 갈아 이 규칙을 덮는다
-   — 일부러 그렇게 뒀다(만세 연출 보존). R9·R10 배경 그림이 들어올 때 같이 정해야 함. */
+   ※옛 경고("아래 .bg.color·.bg.burst가 background를 통째로 갈아 이 규칙을 덮는다")는 지웠다.
+   .bg.color는 규칙째 사라졌고, .bg.burst는 이제 filter만 건드려 그림을 덮지 않는다. */
 .bg.has-img{ background-image:var(--bg-img); background-size:cover; background-position:center; }
 .bg.has-img::before{ display:none; }
 
@@ -133,15 +182,18 @@ body{
 #minimenu button:active{ background:rgba(60,48,28,.9); }
 
 /* 대사 상자 */
-.dialogue-box{ position:relative; z-index:30; width:calc(100% - 28px); margin:0 14px 16px;
+.dialogue-box{ position:relative; z-index:30;
+  width:min(calc(100% - 28px), var(--read-w)); margin:0 auto 16px;
   min-height:118px; background:linear-gradient(180deg,rgba(30,23,15,.94),rgba(18,14,9,.96));
   border:1px solid var(--line); border-radius:14px; padding:20px 22px 26px;
   box-shadow:0 -4px 24px rgba(0,0,0,.5); }
-.dialogue-text{ font-size:19px; line-height:1.85; letter-spacing:.5px; color:var(--text);
-  white-space:pre-wrap; min-height:1.8em; }
+/* 글자 크기를 화면 높이에 묶는다(사용자 지적 15). 값은 타깃 744px에서 지금과 같은
+   19px가 나오도록 잡았다 — 아이패드 미니에선 보이는 게 안 바뀌고, 더 낮은 화면에서만 줄어든다. */
+.dialogue-text{ font-size:clamp(16px,2.55vh,21px); line-height:1.85; letter-spacing:.5px;
+  color:var(--text); white-space:pre-wrap; min-height:1.8em; }
 .dialogue-text.narr{ color:#c9bda2; font-style:italic; }
 /* 묶음 대사(최대 3줄) — 줄별 스타일 */
-.dline{ font-size:19px; line-height:1.7; letter-spacing:.5px; color:var(--text); white-space:pre-wrap; }
+.dline{ font-size:clamp(16px,2.55vh,21px); line-height:1.7; letter-spacing:.5px; color:var(--text); white-space:pre-wrap; }
 .dline + .dline{ margin-top:9px; }
 .dline.narr{ color:#c9bda2; font-style:italic; }
 .dline.emph{ color:var(--gold-lite); }
@@ -170,8 +222,14 @@ body{
 .letter-layer{ position:absolute; z-index:46; inset:0; display:flex; flex-direction:column;
   align-items:center; justify-content:center; text-align:center; padding:44px 34px;
   background:radial-gradient(ellipse at center, rgba(0,0,0,.5) 0%, rgba(0,0,0,.82) 78%); }
-.letter-text{ font-family:'kimgu'; font-size:33px; line-height:1.95; letter-spacing:1px;
-  color:var(--gold-lite); max-width:92%; text-shadow:0 2px 18px #000; }
+/* ⚠️white-space:pre-wrap이 없으면 원고의 줄바꿈(\n)이 띄어쓰기로 뭉개진다(2026-07-20 발견).
+   대사창 쪽(.dialogue-text·.dline)엔 진작 있었는데 편지 전체화면만 빠져 있어서,
+   원고에 4곳 넣은 줄바꿈이 화면에서 하나도 안 나뉘고 있었다. 편지·쪽지는 여기로 온다
+   (engine.js letterFull) — .dline이 아니다. */
+.letter-text{ font-family:'kimgu'; font-size:clamp(24px,4.4vh,36px); line-height:1.95;
+  letter-spacing:1px; color:var(--gold-lite);
+  max-width:min(92%, calc(var(--read-w) + 120px)); text-shadow:0 2px 18px #000;
+  white-space:pre-wrap; }
 .letter-text.han{ font-family:'han'; } .letter-text.ahn{ font-family:'ahn'; }
 .letter-text.yun{ font-family:'yun'; } .letter-text.yunbg{ font-family:'yunbg'; }
 .letter-text.kimgu{ font-family:'kimgu'; }
@@ -179,13 +237,17 @@ body{
 
 /* 이름 자막 — 정갈한 추모 톤(붓글씨). 게임 메인 타자기체와 구분(정본 요소③).
    장소 자막층(caption-layer)과 L1 몽타주 덩어리(montage-group) 양쪽에서 쓴다. */
+/* 그림자를 세 겹으로 겹친다(사용자 지적 23, 2026-07-20). 한 겹 12px짜리로는
+   유화 배경이 밝은 자리에 이름·설명이 묻혀 안 읽혔다. 가까운 겹으로 글자 획을 세우고,
+   먼 겹으로 글자 뒤에만 어둠을 깔아 배경을 안 건드리면서 대비를 만든다. */
 .caption-layer .namecap, .montage-group .namecap{
   font-family:'kimgu',serif; color:var(--gold-lite);
-  font-size:30px; letter-spacing:4px; text-shadow:0 2px 12px #000; }
+  font-size:clamp(22px,4vh,32px); letter-spacing:4px;
+  text-shadow:0 2px 4px rgba(0,0,0,.95), 0 0 16px rgba(0,0,0,.9), 0 0 44px rgba(0,0,0,.72); }
 .caption-layer .tokencap, .montage-group .tokencap{
-  color:#e0d6bf; font-size:15px; line-height:1.7;
+  color:#e0d6bf; font-size:clamp(13px,2vh,17px); line-height:1.7;
   max-width:80%; margin-left:auto; margin-right:auto; text-align:center;
-  text-shadow:0 2px 10px #000; }
+  text-shadow:0 1px 3px rgba(0,0,0,.95), 0 0 14px rgba(0,0,0,.9), 0 0 38px rgba(0,0,0,.7); }
 .caption-layer .tokencap{ margin-top:12px; }
 
 /* 몽타주 초상 층 */
@@ -209,10 +271,21 @@ body{
 .montage-group.exiting{ opacity:0; }
 /* 자막은 처음부터 자리를 차지하되 투명 — 리빌 때 나타나도 초상이 안 밀린다.
    한 번에 또렷이(한 글자씩 타이핑 X = 반전 임팩트 보존, 정본 요소③). */
-.montage-group .namecap, .montage-group .tokencap, .montage-group .scriptcap{
+.montage-group .namecap, .montage-group .tokencap, .montage-group .scriptcap,
+.montage-group .tokenimg{
   opacity:0; transition:opacity .5s; }
 .montage-group.named .namecap, .montage-group.named .tokencap,
-.montage-group.named .scriptcap{ opacity:1; }
+.montage-group.named .scriptcap, .montage-group.named .tokenimg{ opacity:1; }
+/* 증표 그림 — 남성 5인의 필적(.scriptcap)과 같은 자리·같은 무게.
+   사진(200×240)보다 작게 둔다: 얼굴이 주인공이고 증표는 그가 건넨 것이라 종속 관계다.
+   네모를 그대로 두면 사진과 두 개의 상자가 나란히 선 꼴이라, 가장자리를 부드럽게 녹여
+   물건만 남긴다(유화 배경이 어두워 마스크가 자연스럽게 먹는다). */
+.montage-group .tokenimg{ width:132px; height:132px; }
+.montage-group .tokenimg img{ width:100%; height:100%; object-fit:cover; display:block;
+  border-radius:8px;
+  -webkit-mask-image:radial-gradient(ellipse at center, #000 56%, transparent 82%);
+  mask-image:radial-gradient(ellipse at center, #000 56%, transparent 82%);
+  filter:sepia(.18) saturate(.85) brightness(1.02); }
 .montage-group .namecap{ min-height:1.2em; }
 .montage-group .tokencap{ min-height:3.4em; max-width:min(80%,560px); }
 
@@ -220,8 +293,9 @@ body{
    xlsx ending 시트 비고의 "편지(필적 자막)" 구현. 폰트는 script_font 열이 고른다.
    ※열 명 모두 같은 자리. 한용운만 초상 위 겹침이었으나 이름 자막을 넣으면서 폐기. */
 .montage-group .scriptcap{
-  font-size:22px; line-height:1.55; color:var(--gold-lite);
-  max-width:min(88%,430px); text-align:center; text-shadow:0 2px 10px #000;
+  font-size:clamp(17px,2.95vh,24px); line-height:1.55; color:var(--gold-lite);
+  max-width:min(88%,430px); text-align:center;
+  text-shadow:0 2px 4px rgba(0,0,0,.95), 0 0 15px rgba(0,0,0,.9), 0 0 40px rgba(0,0,0,.7);
   margin-top:-2px; }
 .scriptcap.yun{ font-family:'yun',serif; }
 .scriptcap.ahn{ font-family:'ahn',serif; }
@@ -232,7 +306,7 @@ body{
 /* L1 몽타주 초상 — ★공식 흑백 사진(정본 411행 "공식사진 채택 = 미술 원칙 전환").
    게임 본편=목판·익명 / 엔딩=실사·실명. 스타일이 걷히는 것 자체가 반전 클라이맥스.
    ※사진 미소싱 상태에선 회색 줄무늬가 자리만 잡는다(cards.뒷면_공식이미지_img). */
-.montage-portrait{ width:200px; height:240px; border-radius:12px;
+.montage-portrait{ height:clamp(190px,32.2vh,260px); aspect-ratio:5/6; width:auto; border-radius:12px;
   background:repeating-linear-gradient(45deg,#2a2a2a 0 10px,#333 10px 20px);
   filter:grayscale(1) contrast(1.05); border:2px solid #444;
   overflow:hidden; position:relative; flex:0 0 auto;
@@ -279,10 +353,9 @@ body{
    금빛·어두운 판을 걷고, 배경 유화에서 실제로 뽑은 종이색으로 통일한다.
    금색은 그림에 없는 색이라 얹으면 UI만 따로 떠 보였다.
    대사창은 손대지 않는다 — 편지 필적(금색)·엔딩 자막이 걸려 있어서다. */
-/* ⚠️--ink는 파일 맨 위에서 이미 '앱 바깥 여백의 거의 검정'으로 쓰이는 이름이다.
-   여기서 같은 이름에 종이 글씨색을 다시 붙였더니 여백까지 갈색이 됐다(2026-07-18 수정).
-   → 종이 스킨 글씨색은 --ink-paper로 이름을 나눈다. 화면 변화는 여백이 검정으로 돌아오는 것뿐. */
-:root{ --paper-rgb:238,230,213; --ink-paper:#2b2118; --ink-soft:#6b5a44; --ink-line:60,48,34; }
+/* 종이 스킨 변수(--paper-rgb / --ink-paper / --ink-soft / --ink-line)는 파일 맨 위
+   :root로 옮겼다(2026-07-20). 표준 버튼까지 같은 값을 쓰게 되면서, 색의 출발점이
+   파일 중간에 있으면 찾기 어려워서다. */
 
 /* 빈 자리 — 진입 땐 1개. 이 릴레이 사람을 찾을 때마다 채워지고 새 빈 자리가 선다. */
 .find-slots{ display:flex; gap:clamp(8px,1.6vw,14px); justify-content:center;
@@ -334,11 +407,23 @@ body{
 /* 학습 패널 A₂(활판 인쇄물 스킨) */
 .learn-panel{ position:absolute; z-index:45; inset:0; display:flex;
   align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
-.learn-inner{ width:min(88%,560px); background:var(--paper);
-  color:#241c10; border:2px solid #3a2c14; border-radius:6px; padding:30px 28px 20px;
-  box-shadow:0 12px 40px rgba(0,0,0,.6); position:relative;
+/* ── 학습창·퀴즈 공통 판 (사용자 지적 6·7·8, 2026-07-20) ─────────────────
+   크기가 내용에 따라 들쭉날쭉했다. 높이가 auto인 데다 상한이 없어 글이 곧 판 크기였고,
+   게다가 이름퀴즈와 OX가 같은 판을 돌려 쓰는 탓에 이어서 뜰 때 판이 출렁였다.
+   → 가장 긴 내용(초등 OX 해설 131자 + 해설칸 + 계속 버튼)을 기준으로 최소 높이를 잡아
+     세 팝업을 같은 크기로 세운다. 기준값은 맨 위 --panel-min-h.
+   max-height는 안전장치다 — 이 게임은 스크롤이 막혀 있어(#app overflow:hidden)
+   판이 화면보다 커지면 잘린 채 되찾을 방법이 없다. 중등 4지선다처럼 정말 긴 경우만
+   판 안에서 스크롤된다. */
+.learn-inner, .quiz-inner{
+  width:var(--panel-w); min-height:var(--panel-min-h); max-height:84vh; overflow-y:auto;
+  background:var(--paper); color:#241c10; border:2px solid #3a2c14; border-radius:6px;
+  padding:28px 26px; box-shadow:0 12px 40px rgba(0,0,0,.6); position:relative;
+  display:flex; flex-direction:column;
   background-image:repeating-linear-gradient(0deg,transparent 0 30px,rgba(0,0,0,.04) 30px 31px); }
-.learn-text{ font-size:19px; line-height:2; letter-spacing:.3px; min-height:120px; }
+/* 학습창 — 글은 위, 넘김 줄은 판 맨 아래. 페이지를 넘겨도 버튼이 제자리에 있다. */
+.learn-inner{ justify-content:space-between; }
+.learn-text{ font-size:clamp(16px,2.55vh,21px); line-height:2; letter-spacing:.3px; min-height:120px; }
 .learn-text b{ color:var(--crimson); font-weight:700; }
 .learn-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:18px;
   border-top:1px solid #cbb98f; padding-top:12px; }
@@ -350,13 +435,17 @@ body{
 /* 퀴즈 패널 */
 .quiz-panel{ position:absolute; z-index:45; inset:0; display:flex;
   align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
-.quiz-inner{ width:min(88%,560px); background:var(--paper); color:#241c10;
-  border:2px solid #3a2c14; border-radius:6px; padding:26px 24px; text-align:center;
-  box-shadow:0 12px 40px rgba(0,0,0,.6);
-  background-image:repeating-linear-gradient(0deg,transparent 0 30px,rgba(0,0,0,.04) 30px 31px); }
-.quiz-q{ font-size:19px; line-height:1.7; margin-bottom:20px; color:#241c10; }
+/* 퀴즈 — 문항·선택지가 판 한가운데. 해설과 계속 버튼이 나타나도 판 크기는 그대로다. */
+.quiz-inner{ justify-content:center; text-align:center; }
+.quiz-q{ font-size:clamp(16px,2.55vh,21px); line-height:1.7; margin-bottom:20px; color:#241c10; }
 .quiz-options{ display:flex; flex-direction:column; gap:10px; }
-.quiz-opt{ font-family:var(--dlg-font); font-size:16px; color:#241c10;
+/* 이름 퀴즈만 가로 4칸 — 선택지가 인물 이름(최장 4자)뿐이라 세로로 쌓을 이유가 없었고,
+   그 탓에 판이 학습창보다 훨씬 커졌다. 판정은 js/ui.js가 글자 수로 한다.
+   중등 4지선다는 보기가 길어 세로 그대로 간다(같은 클래스를 쓰므로 여기서 갈라야 한다). */
+.quiz-options.is-names{ flex-direction:row; justify-content:center; gap:8px; }
+.quiz-options.is-names .quiz-opt{ flex:1 1 0; padding:14px 6px; font-size:15px;
+  letter-spacing:0; white-space:nowrap; text-align:center; }
+.quiz-opt{ font-family:var(--dlg-font); font-size:clamp(14px,2.15vh,18px); color:#241c10;
   background:rgba(255,255,255,.5); border:1px solid rgba(var(--ink-line),.42);
   border-radius:2px; padding:14px 16px; cursor:pointer; line-height:1.5; }
 .quiz-opt.ox{ font-size:30px; font-weight:700; padding:16px; width:90px; margin:0 auto; }
@@ -368,7 +457,7 @@ body{
   animation:shake .4s; }
 @keyframes ding{ 0%{box-shadow:0 0 0 rgba(58,44,20,0)} 50%{box-shadow:0 0 20px rgba(58,44,20,.55)} 100%{box-shadow:0 0 0 rgba(58,44,20,0)} }
 .ox-row{ display:flex; gap:20px; justify-content:center; }
-.quiz-feedback{ margin-top:18px; font-size:15px; line-height:1.7; color:#3a2c14;
+.quiz-feedback{ margin-top:18px; font-size:clamp(13px,2vh,17px); line-height:1.7; color:#3a2c14;
   background:rgba(58,44,20,.09); border-radius:2px; padding:14px; text-align:left;
   border-left:3px solid rgba(var(--ink-line),.5); }
 #quiz-continue{ margin-top:18px; }
@@ -434,15 +523,25 @@ body{
 #screen-result{ padding:20px;
   background:linear-gradient(rgba(14,11,8,.60),rgba(14,11,8,.60)),
              url('../assets/img/bg/manse_burst.jpg') center/cover no-repeat; }
-.result-heading{ font-family:'kimgu',serif; font-size:26px; color:var(--paper);
+.result-heading{ font-family:'kimgu',serif; font-size:clamp(20px,3.5vh,28px); color:var(--paper);
   letter-spacing:4px; margin:10px 0 20px; }
+/* 종이색으로 통일(2026-07-20). 다른 버튼이 전부 종이가 되면서 이것만 금테로 남아 튀었다.
+   주버튼(확인·저장 등)보다 작게 둬서 보조 조작이라는 것은 크기로 구분한다. */
 .result-topbtn{ position:absolute; top:16px; right:16px; font-family:var(--dlg-font);
-  background:rgba(20,16,10,.8); color:var(--gold); border:1px solid var(--line);
-  border-radius:10px; padding:8px 14px; cursor:pointer; font-size:13px; }
+  background:rgba(var(--paper-rgb),.93); color:var(--ink-paper);
+  border:1px solid rgba(var(--ink-line),.45); border-radius:2px;
+  padding:9px 15px; cursor:pointer; font-size:13px; letter-spacing:1px;
+  box-shadow:0 2px 8px rgba(0,0,0,.35); }
+.result-topbtn:active{ background:rgba(214,204,184,.96);
+  box-shadow:0 1px 3px rgba(0,0,0,.35); transform:translateY(1px); }
 .result-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px;
   max-width:640px; width:100%; }
 .result-cell{ text-align:center; opacity:0; animation:fadein 1.2s forwards; }
-.result-portrait{ aspect-ratio:3/4; border-radius:8px; border:1px solid var(--gold);
+/* 금테 없음(사용자 확정 2026-07-20) — 찾기 화면 포스터 자리와 같은 판단이다.
+   유화·사진에 금빛 테두리를 두르면 그림과 따로 논다. 사진 자체가 사각이라 경계는
+   이미 서므로, 바닥에 앉히는 옅은 그림자만 남긴다. */
+.result-portrait{ aspect-ratio:3/4; border-radius:8px; border:0;
+  box-shadow:0 3px 12px rgba(0,0,0,.5);
   background:#1a1510; display:flex; align-items:center; overflow:hidden;
   justify-content:center; color:#fff; font-size:11px; }
 .result-portrait img{ width:100%; height:100%; object-fit:cover; display:block;
@@ -464,3 +563,45 @@ body{
 .loading-text{ color:var(--muted); letter-spacing:3px; }
 
 /* 페이드인 유틸 */
+
+/* ---------- 도감 저장(PDF) 지면 ----------
+   화면에 보이는 도감 카드는 3D로 뒤집히지만(perspective/rotateY), 저장본은 멈춘 종이라
+   한 면만 찍힌다. 그래서 화면을 그대로 캡처하지 않고, 앞면(초상·한마디)과 뒷면(이름·생몰년)을
+   한 줄에 나란히 편 전용 지면을 따로 짠다. 도감의 색·글꼴은 그대로 쓴다.
+   ※px 고정 — html2canvas가 뷰포트와 무관하게 같은 크기로 찍게 하려고. (A4 96dpi = 794×1123)
+   화면 밖에 두되 display:none 은 금물 — 레이아웃이 안 잡혀 빈 그림이 찍힌다. */
+.pdf-sheet{ position:fixed; left:-10000px; top:0; z-index:-1; }
+/* 종이는 한지색 — 화면 도감은 검정 바탕이지만 저장본은 뽑아 가는 물건이라
+   검정을 그대로 인쇄하면 잉크를 다 먹는다(사용자 확정). 조작 UI와 같은 A2안 한지 팔레트. */
+.pdf-page{ width:794px; height:1123px; background:rgb(var(--paper-rgb));
+  color:var(--ink-paper); font-family:var(--dlg-font); padding:46px 52px;
+  box-sizing:border-box; display:flex; flex-direction:column; }
+.pdf-head{ border-bottom:1px solid rgba(var(--ink-line),.4); padding-bottom:14px;
+  margin-bottom:16px; }
+.pdf-head h1{ font-family:'kimgu',serif; font-size:30px; color:var(--ink-paper);
+  letter-spacing:6px; margin:0; }
+.pdf-head p{ font-size:12px; color:var(--ink-soft); letter-spacing:2px; margin:8px 0 0; }
+.pdf-rows{ display:flex; flex-direction:column; gap:16px; }
+.pdf-row{ display:flex; gap:14px; height:178px; }
+/* 한 사람당 그림 두 장 — 왼쪽 유화(정답 포스터), 오른쪽 공식 흑백사진.
+   도감 앞면과 엔딩 몽타주에 각각 쓰이던 두 얼굴을 저장본에선 나란히 남긴다(사용자 확정). */
+.pdf-card{ position:relative; width:128px; height:178px; flex:none; border-radius:10px;
+  border:1px solid rgba(var(--ink-line),.35); overflow:hidden;
+  background:linear-gradient(180deg,#5a6b7a,#8a4a3a); }
+.pdf-photo{ background:#2a2620; }
+/* 포스터는 2:3, 칸은 3:4 — 얼굴이 잘리지 않게 위로 붙여 자른다(도감 앞면과 같은 규칙) */
+.pdf-card img{ position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; object-position:50% 18%; }
+/* 공식사진은 400×480(5:6) 인물 정면 — 위쪽이 아니라 가운데를 기준으로 자른다 */
+.pdf-photo img{ object-position:50% 34%; }
+.pdf-info{ flex:1; display:flex; flex-direction:column; justify-content:center;
+  border-bottom:1px solid rgba(var(--ink-line),.22); padding-bottom:10px;
+  margin-left:8px; }
+.pdf-name{ font-family:'kimgu',serif; font-size:25px; color:var(--ink-paper);
+  letter-spacing:2px; }
+.pdf-meta{ font-size:12.5px; color:var(--ink-soft); margin-top:5px; letter-spacing:1px; }
+.pdf-line{ font-size:14px; line-height:1.6; margin-top:11px; color:var(--ink-paper); }
+.pdf-quote{ font-size:13px; line-height:1.65; margin-top:9px; color:var(--ink-soft);
+  padding-left:10px; border-left:2px solid rgba(158,43,37,.5); }
+.pdf-foot{ margin-top:auto; text-align:right; font-size:11px; color:var(--ink-soft);
+  letter-spacing:2px; }
