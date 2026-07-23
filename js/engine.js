@@ -296,19 +296,37 @@
       const layer = tokenLayer(), img = $('token-img'), cont = layer.querySelector('.token-cont');
       $('dialogue-box').classList.add('hidden');
       cont.classList.add('hidden');
-      layer.classList.remove('hidden', 'is-in'); void layer.offsetWidth;
-      img.src = new URL(src, document.baseURI).href;
-      layer.classList.add('is-in');
-      // 물건이 다 떠오른 뒤에 ▼를 준다. 타자기가 글자를 다 친 뒤 ▼를 주는 것과 같은 박자.
-      let done = false;
-      const t = setTimeout(() => { done = true; cont.classList.remove('hidden'); }, 1100);
-      function onTap() {
-        if (!done) { clearTimeout(t); done = true; cont.classList.remove('hidden'); return; }
-        $('stage').removeEventListener('click', onTap);
-        layer.classList.add('hidden'); layer.classList.remove('is-in');
-        resolve();
+      const url = new URL(src, document.baseURI).href;
+
+      // ▼·떠오름·탭 처리는 그대로. 다만 '층을 띄우는 것'은 새 그림이 준비된 뒤로 미룬다.
+      function show() {
+        layer.classList.remove('hidden', 'is-in'); void layer.offsetWidth;
+        layer.classList.add('is-in');
+        // 물건이 다 떠오른 뒤에 ▼를 준다. 타자기가 글자를 다 친 뒤 ▼를 주는 것과 같은 박자.
+        let done = false;
+        const t = setTimeout(() => { done = true; cont.classList.remove('hidden'); }, 1100);
+        function onTap() {
+          if (!done) { clearTimeout(t); done = true; cont.classList.remove('hidden'); return; }
+          $('stage').removeEventListener('click', onTap);
+          layer.classList.add('hidden'); layer.classList.remove('is-in');
+          resolve();
+        }
+        $('stage').addEventListener('click', onTap);
       }
-      $('stage').addEventListener('click', onTap);
+
+      // ★이전 증표 잔상 버그 수정: 새 그림이 다 뜬 뒤에 층을 보인다. 안 그러면 #token-img에 남은
+      //  '직전 사람의 증표'가 한 프레임 번쩍였다 사라진다(여성 증표가 이어질 때 발생).
+      //  층은 그 전까지 .hidden(display:none)이라 옛 그림이 보이지 않는다.
+      if (img.getAttribute('src') === url && img.complete && img.naturalWidth) {
+        show();                                    // 같은 그림이 이미 준비돼 있으면 바로
+      } else {
+        let shown = false;
+        const go = () => { if (shown) return; shown = true; img.onload = img.onerror = null; show(); };
+        img.onload = go;
+        img.onerror = go;                          // 그림을 못 불러와도 멈추지 않고 진행
+        img.src = url;
+        setTimeout(go, 700);                       // 안전판: onload가 안 와도(캐시 등) 진행
+      }
     });
   }
 
@@ -476,6 +494,7 @@
 
     layer.classList.remove('hidden');
     layer.classList.remove('is-busy');   // 앞 릴레이가 남겼을 수 있는 잠금 상태를 걷고 시작
+    layer.classList.remove('quiz-mode'); // 퀴즈가 같은 층을 쓰므로 그 모드 잔재도 걷는다
     clearPortrait();
     $('find-prompt').textContent = L['find.prompt'] || '';
     const input = buildInput();
@@ -638,53 +657,109 @@
     });
   }
 
-  // ---------- 퀴즈 ----------
+  // ---------- 퀴즈 = 정체 맞히기(탭) → 내용 퀴즈(코드 입력) ----------
+  // 내용 퀴즈는 화면 보기(OX·①②③④)를 없애고 오프라인 정보 카드의 3자리 코드를 친다.
+  // 포스터 찾기 층(#find-layer)을 '퀴즈 모드'로 재사용한다(슬롯 없이 질문+입력칸만).
+  //   정답 코드   → 통과
+  //   이 인물 오답 → 해설을 대사창에(질문·입력칸은 그대로 남고, 커서만 빠져 키보드가 내려감)
+  //   그 외/없는 코드 → 오류(입력칸 흔들림, 대사 없음)  ← 포스터의 '헛번호' 흔들림 재사용
   Engine.playQuiz = async function (sceneId, person, onDone) {
     const grade = window.G.grade;
     const q = (window.G.data.quiz[grade] || {})[sceneId];
-    // 1) 인물 맞히기(정답이어야 진행) → 2) 기존 내용 퀴즈
+    const L = window.G.data.labels || {};
+
+    // 1) 정체 맞히기(누구게?) — 화면 탭 그대로 유지(오프라인화 안 함)
     await identityQuiz(person);
-    const panel = $('quiz-panel'), qEl = $('quiz-q'), optWrap = $('quiz-options'),
-      fbEl = $('quiz-feedback'), cont = $('quiz-continue');
-    if (!q) { if (onDone) onDone(); return; }
-    panel.classList.remove('hidden');
-    $('dialogue-box').classList.add('hidden');
-    qEl.textContent = q.q;
-    fbEl.classList.add('hidden'); cont.classList.add('hidden');
-    optWrap.innerHTML = '';
 
-    function finish() { panel.classList.add('hidden'); cont.onclick = null; if (onDone) onDone(); }
-    cont.onclick = finish;
+    // 데이터가 없으면(안전) 바로 통과
+    if (!q || !q.cards || !q.cards.length) { if (onDone) onDone(); return; }
 
-    function lock(disabled) { [...optWrap.querySelectorAll('.quiz-opt')].forEach((b) => b.disabled = disabled); }
+    const layer = $('find-layer'), codeEl = $('find-code'), pad = $('find-pad'),
+      slots = $('find-slots'), box = $('dialogue-box');
+    let busy = false;
 
-    if (grade === '초등') {
-      const row = document.createElement('div'); row.className = 'ox-row';
-      ['O', 'X'].forEach((sym) => {
-        const b = document.createElement('button'); b.className = 'quiz-opt ox'; b.textContent = sym;
-        b.onclick = () => {
-          const ok = (sym === q.answer);
-          b.classList.add(ok ? 'correct' : 'wrong');
-          fbEl.textContent = ok ? q.fb_ok : q.fb_no; fbEl.classList.remove('hidden');
-          if (ok) { lock(true); cont.classList.remove('hidden'); }
-          else { setTimeout(() => { b.classList.remove('wrong'); }, 500); }
-        };
-        row.appendChild(b);
-      });
-      optWrap.appendChild(row);
-    } else {
-      q.options.forEach((opt, idx) => {
-        const b = document.createElement('button'); b.className = 'quiz-opt';
-        b.textContent = (idx + 1) + '. ' + opt;
-        b.onclick = () => {
-          const ok = (idx + 1 === q.answer);
-          b.classList.add(ok ? 'correct' : 'wrong');
-          fbEl.textContent = q.fb[idx]; fbEl.classList.remove('hidden');
-          if (ok) { lock(true); cont.classList.remove('hidden'); }
-          else { setTimeout(() => b.classList.remove('wrong'), 500); }
-        };
-        optWrap.appendChild(b);
-      });
+    // 화면 세우기: 포스터 찾기 층을 퀴즈 모드로
+    $('quiz-panel').classList.add('hidden');           // 정체 맞히기 패널 정리
+    layer.classList.remove('hidden', 'is-busy');
+    layer.classList.add('quiz-mode');                  // 슬롯 숨김 + 키보드 위로 고정(CSS)
+    box.classList.add('hidden');
+    slots.innerHTML = '';
+    $('find-prompt').textContent =
+      (L['quiz.find_q'] || '{인물}에 관한 정보로 올바른 것을 찾아 코드를 입력하세요').replace('{인물}', person);
+
+    // 입력칸(진짜 <input>) — 포스터 찾기와 동일 방식(숫자 3자리·세 자리째 자동 판정)
+    pad.innerHTML = ''; pad.classList.add('hidden');
+    codeEl.innerHTML = '';
+    const input = document.createElement('input');
+    input.className = 'find-input';
+    input.type = 'text'; input.inputMode = 'numeric';
+    input.setAttribute('pattern', '[0-9]*'); input.autocomplete = 'off';
+    input.maxLength = 3; input.placeholder = L['find.slot_code'] || '···';
+    ['pointerdown', 'mousedown', 'touchstart', 'click'].forEach((ev) =>
+      input.addEventListener(ev, (e) => e.stopPropagation()));
+    input.addEventListener('input', () => {
+      const v = input.value.replace(/\D/g, '').slice(0, 3);
+      if (v !== input.value) input.value = v;
+      if (busy) return;
+      if (v.length === 3) setTimeout(submit, 250);     // 세 자리째 = 자동 판정(약간의 여유)
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); if (!busy && input.value.length === 3) submit(); }
+    });
+    input.addEventListener('focus', hideHaeseol);        // 다시 치려고 입력칸을 누르면 해설을 닫는다
+    codeEl.appendChild(input);
+    input.focus();
+
+    // 해설(대사창) — 오답 카드일 때만. 질문·입력칸은 그대로 남기고, 다른 대사처럼 타자기로 흐른다.
+    let haeTimer = null;
+    function hideHaeseol() {
+      if (haeTimer) { clearInterval(haeTimer); haeTimer = null; }
+      box.classList.add('hidden'); box.onclick = null; $('dialogue-text').textContent = '';
+    }
+    function showHaeseol(text) {
+      const el = $('dialogue-text');
+      box.classList.remove('hidden');
+      el.className = 'dialogue-text'; el.textContent = '';
+      $('dialogue-cont').classList.add('hidden');
+      const spd = SPEED[window.G.speed] || 30;
+      let i = 0;
+      haeTimer = setInterval(() => {
+        if (i >= text.length) { clearInterval(haeTimer); haeTimer = null;
+          $('dialogue-cont').classList.remove('hidden'); return; }   // 다 흐르면 ▼
+        el.textContent += text[i++];
+      }, spd);
+      box.onclick = () => { hideHaeseol(); input.focus(); };          // 탭하면 닫고 다시 입력
+    }
+    function shake() {
+      codeEl.classList.remove('shake-now'); void codeEl.offsetWidth;
+      codeEl.classList.add('shake-now');
+    }
+
+    // 정답 = 가벼운 '맞았다' 박자 후 부드럽게 사라진다(포스터의 2.9초 극적 전환보다 가볍게).
+    async function pass() {
+      busy = true; input.disabled = true;
+      input.classList.add('is-correct');   // 입력한 코드가 보인 채 옅은 정답 강조
+      await pause(900);                     // 판정 박자(0.4) + 강조 유지(0.5)
+      layer.classList.add('is-leaving');    // 0.4초 페이드 아웃
+      await pause(400);
+      layer.classList.add('hidden');
+      layer.classList.remove('quiz-mode', 'is-leaving');
+      box.classList.add('hidden');
+      if (onDone) onDone();                 // 다음 장면(◯-5)이 이어서 자체 전환으로 열린다
+    }
+
+    function submit() {
+      const code = input.value;
+      const card = q.cards.find((c) => String(c.code) === code);
+      hideHaeseol();                                     // 이전 해설이 떠 있으면 걷고 새로 판정
+      // ③ 그 외/없는 코드 = 오류(흔들림, 대사 없음)
+      if (!card) { input.value = ''; shake(); return; }
+      // ① 정답 = 통과(박자 후 전환)
+      if (card.type === '정답') { pass(); return; }
+      // ② 이 인물 오답 = 해설. 코드는 지우고, 커서만 빠져 키보드가 내려가 해설이 안 가린다.
+      input.value = '';
+      input.blur();
+      showHaeseol(card.feedback);
     }
   };
 
@@ -694,6 +769,8 @@
   Engine.typewriter = typewriter;
   Engine.typeAuto = typeAuto;
   Engine.identityQuiz = identityQuiz;   // 미리보기/테스트용 노출
+  Engine.tokenFull = tokenFull;         // 증표 클로즈업(테스트용 노출)
+  Engine.tokenSrc = tokenSrc;
   window.Engine = Engine;
   if (document.readyState === 'loading')
     document.addEventListener('DOMContentLoaded', watchDialogueHeight);

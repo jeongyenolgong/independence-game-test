@@ -111,3 +111,20 @@
   from{ opacity:0; transform:scale(.94) translateY(10px); }
   to{   opacity:1; transform:none; } }
 .token-cont{ position:static; margin-top:26px; font-size:16px; }
+
+/* ---------- 코드입력 퀴즈(내용 퀴즈 오프라인화) ----------
+   포스터 찾기 층(#find-layer)을 그대로 재사용하되, 퀴즈에선 '빈 자리 슬롯'이 없다
+   (모을 사람이 아니라 정답 카드 하나를 고르는 것). 질문 종이판(.find-prompt)+입력칸만 남긴다.
+   위치: 타이핑 때 소프트 키보드(아이패드 미니 가로 ≈353px)가 입력칸을 덮지 않도록 위로 고정.
+   position:absolute라 아래 대사창(해설)이 떠도 질문·입력칸이 움직이지 않는다(사용자 확정). */
+.find-layer.quiz-mode{ position:absolute; left:0; right:0; top:31%; margin:0 14px; }
+.find-layer.quiz-mode .find-slots{ display:none; }
+
+/* 코드입력 퀴즈 — 정답 박자·전환 (2026-07-23 사용자 확정 타이밍) */
+/* 정답 입력칸 강조: 초록이 아니라 먹선 링(종이 스킨 A2 규칙과 같은 결). 0.9초 보였다가 사라진다. */
+.find-input.is-correct{
+  border-color:rgba(var(--ink-line),.95);
+  box-shadow:0 0 0 2px rgba(var(--ink-line),.45), 0 2px 8px rgba(0,0,0,.3);
+  background:rgba(220,210,190,.98); }
+/* 퀴즈 층이 다음 장면으로 넘어가기 전 0.4초 부드럽게 사라짐(하드 컷 방지) */
+.find-layer.quiz-mode.is-leaving{ transition:opacity .4s ease; opacity:0; }
