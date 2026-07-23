@@ -1,8 +1,9 @@
-/* 화면 보조 동작 — 첫 화면 암구호 검사 + 이름 퀴즈 가로 배치 판정.
+/* 화면 보조 동작 — 첫 화면 암구호 검사.
  *
  * 왜 별도 파일인가: engine.js·main.js는 다른 작업 창이 동시에 고치고 있다.
- * 이 두 가지는 화면(index.html·style.css) 쪽 일이라 여기 따로 두면 서로 안 부딪힌다.
+ * 이건 화면(index.html·style.css) 쪽 일이라 여기 따로 두면 서로 안 부딪힌다.
  * 나중에 한 창으로 합칠 때 engine.js·main.js로 흡수해도 된다.
+ * (이름 퀴즈 가로배치는 engine.js identityQuiz가 .is-names를 직접 붙이므로 이 파일에서 빠졌다.)
  */
 (function () {
   'use strict';
@@ -49,35 +50,4 @@
     var btn = document.getElementById('btn-start');
     if (btn) btn.click();
   });
-
-  /* ── ② 이름 퀴즈만 가로 4칸 ────────────────────────────────────────
-     이름 퀴즈와 중등 4지선다가 같은 패널·같은 버튼 클래스를 돌려 쓴다. 둘 다 선택지가
-     4개라 개수로는 못 가른다. 가르는 건 길이다 — 인물 이름은 최장 4자(김마리아),
-     중등 보기는 최단 15자를 넘는다. 8자를 경계로 두면 안전하다.
-     ※engine.js에서 이름 퀴즈에 전용 클래스를 붙여주면 이 관찰자는 지워도 된다. */
-  var NAME_MAX = 8;
-
-  function markNameQuiz() {
-    var wrap = document.getElementById('quiz-options');
-    if (!wrap) return;
-    var opts = wrap.querySelectorAll('.quiz-opt');
-    var isNames = opts.length === 4;
-    for (var i = 0; isNames && i < opts.length; i++) {
-      if (opts[i].textContent.trim().length > NAME_MAX) isNames = false;
-    }
-    wrap.classList.toggle('is-names', isNames);
-  }
-
-  function watchQuiz() {
-    var wrap = document.getElementById('quiz-options');
-    if (!wrap) return;
-    new MutationObserver(markNameQuiz).observe(wrap, { childList: true });
-    markNameQuiz();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', watchQuiz);
-  } else {
-    watchQuiz();
-  }
 })();

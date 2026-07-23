@@ -633,8 +633,7 @@
   // ---------- 인물 맞히기 퀴즈(퀴즈 전, 4지선다·오답=흔들림) ----------
   function identityQuiz(person) {
     return new Promise((resolve) => {
-      const panel = $('quiz-panel'), qEl = $('quiz-q'), optWrap = $('quiz-options'),
-        fbEl = $('quiz-feedback'), cont = $('quiz-continue');
+      const panel = $('quiz-panel'), qEl = $('quiz-q'), optWrap = $('quiz-options');
       const L = window.G.data.labels || {};
       const names = (window.G.data.cards || []).map((c) => c['실명']);
       const others = shuffle(names.filter((n) => n !== person)).slice(0, 3);
@@ -643,8 +642,8 @@
       panel.classList.remove('hidden');
       $('dialogue-box').classList.add('hidden');
       qEl.textContent = L['quiz.identity_q'] || '지금 이 대화 속 주인공은 누구일까요?';
-      fbEl.classList.add('hidden'); cont.classList.add('hidden');
       optWrap.innerHTML = '';
+      optWrap.classList.add('is-names');   // 이름 4칸 가로 배치(옛 ui.js 관찰자 대체)
       opts.forEach((name) => {
         const b = document.createElement('button');
         b.className = 'quiz-opt'; b.textContent = name;
@@ -768,9 +767,7 @@
 
   Engine.typewriter = typewriter;
   Engine.typeAuto = typeAuto;
-  Engine.identityQuiz = identityQuiz;   // 미리보기/테스트용 노출
-  Engine.tokenFull = tokenFull;         // 증표 클로즈업(테스트용 노출)
-  Engine.tokenSrc = tokenSrc;
+  Engine.identityQuiz = identityQuiz;   // 미리보기/테스트용 노출(preview-identity.html)
   window.Engine = Engine;
   if (document.readyState === 'loading')
     document.addEventListener('DOMContentLoaded', watchDialogueHeight);

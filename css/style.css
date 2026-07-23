@@ -439,28 +439,15 @@ body{
 .quiz-inner{ justify-content:center; text-align:center; }
 .quiz-q{ font-size:clamp(16px,2.55vh,21px); line-height:1.7; margin-bottom:20px; color:#241c10; }
 .quiz-options{ display:flex; flex-direction:column; gap:10px; }
-/* 이름 퀴즈만 가로 4칸 — 선택지가 인물 이름(최장 4자)뿐이라 세로로 쌓을 이유가 없었고,
-   그 탓에 판이 학습창보다 훨씬 커졌다. 판정은 js/ui.js가 글자 수로 한다.
-   중등 4지선다는 보기가 길어 세로 그대로 간다(같은 클래스를 쓰므로 여기서 갈라야 한다). */
+/* 이름 퀴즈만 가로 4칸 — 선택지가 인물 이름(최장 4자)뿐이라 세로로 쌓으면 판이 커진다.
+   가로 배치는 engine.js identityQuiz가 .is-names를 직접 붙여 켠다. */
 .quiz-options.is-names{ flex-direction:row; justify-content:center; gap:8px; }
 .quiz-options.is-names .quiz-opt{ flex:1 1 0; padding:14px 6px; font-size:15px;
   letter-spacing:0; white-space:nowrap; text-align:center; }
 .quiz-opt{ font-family:var(--dlg-font); font-size:clamp(14px,2.15vh,18px); color:#241c10;
   background:rgba(255,255,255,.5); border:1px solid rgba(var(--ink-line),.42);
   border-radius:2px; padding:14px 16px; cursor:pointer; line-height:1.5; }
-.quiz-opt.ox{ font-size:30px; font-weight:700; padding:16px; width:90px; margin:0 auto; }
 .quiz-opt:active{ background:rgba(var(--ink-line),.1); }
-/* 맞고 틀림은 색으로 남긴다 — 금빛 대신 먹빛(정답)·주홍(오답). 종이 위에서도 또렷하다. */
-.quiz-opt.correct{ border-color:#3a2c14; border-width:2px; background:rgba(58,44,20,.14);
-  font-weight:700; animation:ding .5s; }
-.quiz-opt.wrong{ border-color:var(--crimson); background:rgba(158,43,37,.14);
-  animation:shake .4s; }
-@keyframes ding{ 0%{box-shadow:0 0 0 rgba(58,44,20,0)} 50%{box-shadow:0 0 20px rgba(58,44,20,.55)} 100%{box-shadow:0 0 0 rgba(58,44,20,0)} }
-.ox-row{ display:flex; gap:20px; justify-content:center; }
-.quiz-feedback{ margin-top:18px; font-size:clamp(13px,2vh,17px); line-height:1.7; color:#3a2c14;
-  background:rgba(58,44,20,.09); border-radius:2px; padding:14px; text-align:left;
-  border-left:3px solid rgba(var(--ink-line),.5); }
-#quiz-continue{ margin-top:18px; }
 
 /* ---------- 도감 ---------- */
 #screen-codex{ background:#141009; justify-content:flex-start; z-index:70; }
