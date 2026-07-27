@@ -190,12 +190,6 @@
     if (onDone) onDone();
   };
 
-  function waitTap() {
-    return new Promise((resolve) => {
-      function h(e) { $('stage').removeEventListener('click', h); resolve(); }
-      $('stage').addEventListener('click', h);
-    });
-  }
   function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
   // 리빌 착지 여음(ms) 뒤에 탭을 받는다. 단, 여음 중에 들어온 탭은 버리지 않고
   // 담아 뒀다가 착지하는 즉시 넘어간다 — 정본 "리빌 착지 후 탭=다음 인물"을

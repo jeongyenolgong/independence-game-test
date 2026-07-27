@@ -347,7 +347,6 @@ body{
    768 이상에서는 clamp 상한에 걸려 지금과 픽셀이 완전히 같다(디자인 불변). */
 .find-layer{ position:relative; z-index:29; display:flex; flex-direction:column;
   align-items:center; gap:clamp(6px,1.2vh,12px); margin:0 14px 10px; min-height:0; }
-.find-layer.is-busy .find-pad{ pointer-events:none; opacity:.45; }
 
 /* ── A2안 「한지 전단」(사용자 확정 2026-07-18) ───────────────────────────
    금빛·어두운 판을 걷고, 배경 유화에서 실제로 뽑은 종이색으로 통일한다.
@@ -383,26 +382,9 @@ body{
   padding:clamp(6px,1.2vh,11px) clamp(14px,3vw,26px);
   border:1px solid rgba(var(--ink-line),.4); box-shadow:0 2px 10px rgba(0,0,0,.35); }
 .find-code{ display:flex; gap:clamp(8px,1.6vw,12px); }
-/* line-height로 세로중앙을 잡으면 높이가 줄 때 글자가 칸 밖으로 나간다 → grid로 바꿈 */
-.find-digit{ width:clamp(44px,7.5vh,58px); height:clamp(48px,8.5vh,64px); border-radius:0;
-  border:1px solid rgba(var(--ink-line),.5); background:rgba(var(--paper-rgb),.92);
-  color:var(--ink-paper); box-shadow:0 2px 8px rgba(0,0,0,.3);
-  font-family:var(--dlg-font); font-size:clamp(22px,4vh,30px);
-  display:grid; place-items:center; line-height:1; text-align:center; }
-.find-digit.is-on{ border-color:rgba(var(--ink-line),.85); }
-
-/* 세로 4줄(3열) → 가로 2줄(6열). 세로로 길면 포스터를 키울 자리가 안 나온다. */
-.find-pad{ display:grid; grid-template-columns:repeat(6,1fr); gap:clamp(6px,1.1vh,9px);
-  width:100%; max-width:560px; }
-.find-key{ font-family:var(--dlg-font); font-size:clamp(17px,2.8vh,21px);
-  height:clamp(40px,7vh,54px);
-  background:rgba(var(--paper-rgb),.92); color:var(--ink-paper);
-  border:1px solid rgba(var(--ink-line),.35); border-radius:2px; cursor:pointer;
-  box-shadow:0 2px 7px rgba(0,0,0,.3); }
-.find-key:active{ background:rgba(214,204,184,.96); box-shadow:0 1px 3px rgba(0,0,0,.35); }
-/* 지우기 — 숫자와 같은 크기면 글자가 넘친다 */
-.find-key.is-del{ font-size:13px; letter-spacing:1px; color:var(--ink-soft); }
-.find-key.is-blank{ visibility:hidden; }
+/* 옛 자체 숫자키패드(.find-pad/.find-key/.find-digit) 규칙은 지웠다(2026-07-27).
+   진짜 <input>으로 바꾼 뒤(2026-07-20) 아무 데서도 쓰지 않는 껍데기였다.
+   지금 입력칸 모양은 fx.css의 .find-input이 잡는다. */
 
 /* 학습 패널 A₂(활판 인쇄물 스킨) */
 .learn-panel{ position:absolute; z-index:45; inset:0; display:flex;

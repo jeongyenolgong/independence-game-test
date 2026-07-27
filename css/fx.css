@@ -13,7 +13,7 @@
 .bg-prev.is-fading{ animation:bgdissolve var(--bg-fade) ease forwards; }
 
 /* ---------- ① 코드 입력 = 진짜 input ----------
-   자체 숫자키패드(.find-pad)는 engine.js가 비우고 숨긴다. 기기 자판을 그대로 쓴다
+   자체 숫자키패드는 걷어냈다(껍데기 DOM·CSS까지 2026-07-27 삭제). 기기 자판을 그대로 쓴다
    (inputmode=numeric → 태블릿에서 숫자 자판이 뜬다). */
 .find-input{
   font-family:var(--dlg-font);
@@ -128,3 +128,31 @@
   background:rgba(220,210,190,.98); }
 /* 퀴즈 층이 다음 장면으로 넘어가기 전 0.4초 부드럽게 사라짐(하드 컷 방지) */
 .find-layer.quiz-mode.is-leaving{ transition:opacity .4s ease; opacity:0; }
+
+/* ---------- 친일파 ③ 유화·사진 대조 (2026-07-23) ----------
+   친일파 코드 입력 → ①반응대사 → ②학습창 → 이 화면(engine.js chinilpaCompare).
+   등장 릴레이 배경을 dim으로 깔고, 그 위에 유화(게임 속 위장·색) | 실제 사진(역사 기록·흑백)을
+   나란히 + 이름(생몰년)만. 지어낸 타이틀·라벨 없음(사용자 확정 §5-4).
+   z:48 = 학습창(45)·편지(46) 위, 도감/설정(70) 아래. */
+.chinilpa-compare{ position:absolute; inset:0; z-index:48; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:clamp(16px,3vh,30px); padding:34px 24px; box-sizing:border-box;
+  background:radial-gradient(ellipse at center, rgba(0,0,0,.66) 0%, rgba(0,0,0,.9) 80%);
+  opacity:0; transition:opacity .6s ease; }
+.chinilpa-compare.is-in{ opacity:1; pointer-events:auto; }
+.chinilpa-compare.is-out{ opacity:0; }
+.cc-pair{ display:flex; align-items:flex-end; justify-content:center; gap:clamp(14px,3.4vw,42px); }
+/* 두 그림 같은 높이. 유화=2:3 그대로(색), 사진=3:4 액자에 담아 흑백으로.
+   ⚠높이 기준은 vh·vw만(%금지). 부모 .cc-pair가 높이 auto라 %는 해석 안 돼 그림이
+   본래 크기로 커지며 이름 캡션이 화면 밖으로 밀려났다. vw로 폭까지 묶어 세로/가로 안전. */
+.cc-oil{ height:min(48vh,42vw); width:auto; display:block; object-fit:cover;
+  border:2px solid #3a2c14; border-radius:6px; box-sizing:border-box;
+  box-shadow:0 10px 34px rgba(0,0,0,.55); }
+.cc-photo-frame{ height:min(48vh,42vw); aspect-ratio:3/4; overflow:hidden;
+  border:2px solid #3a2c14; border-radius:6px; box-sizing:border-box; background:#000;
+  box-shadow:0 10px 34px rgba(0,0,0,.55); }
+.cc-photo{ width:100%; height:100%; object-fit:cover; display:block;
+  filter:grayscale(1) contrast(1.02) brightness(1.02); }
+.cc-name{ font-family:var(--dlg-font); color:var(--paper);
+  font-size:clamp(18px,3vh,26px); letter-spacing:3px; text-align:center; margin:0; }
+.cc-cont{ position:static; margin-top:2px; color:var(--gold); font-size:16px; }

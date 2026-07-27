@@ -3125,7 +3125,11 @@
     "result": "복귀",
     "code": "282",
     "poster_img": "assets/img/poster/r01_l_sunsa.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
@@ -3136,7 +3140,11 @@
     "result": "복귀",
     "code": "141",
     "poster_img": "assets/img/poster/r01_c_basketgirl.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "우",
@@ -3147,7 +3155,11 @@
     "result": "반전(7-2)",
     "code": "907",
     "poster_img": "assets/img/poster/r01_r_yugwansun.jpg",
-    "hint": "“장터를 돌다 보면, 흰 무명 저고리에 댕기를 곱게 드린 소녀를 보게 될 거요.”"
+    "hint": "“장터를 돌다 보면, 흰 무명 저고리에 댕기를 곱게 드린 소녀를 보게 될 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    }
   ],
   "R2": [
@@ -3160,18 +3172,26 @@
     "result": "반전(8-2)",
     "code": "814",
     "poster_img": "assets/img/poster/r02_l_yundongju.jpg",
-    "hint": "“저기, 손에는 책이 있고 눈이 맑은 청년이 있을 거요.”"
+    "hint": "“저기, 손에는 책이 있고 눈이 맑은 남자가 있을 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
-    "appearance": "책 한 권을 든 채 오가는 사람을 흘깃거리는, 눈매가 날카로운 낯선 사내",
-    "type": "위험",
-    "response": "사내가 들고 있던 책을 탁 덮으며, 나를 위아래로 훑었다.\n“…그건 네가 알 것 없다. 한데, 품에 감춘 건 무엇이냐?”\n나는 등줄기가 서늘해져, 얼른 사람들 틈으로 몸을 숨겼다.",
-    "fx": "긴장(J)",
-    "result": "복귀",
+    "appearance": "값진 비단옷을 걸치고 좌판 곁을 지나던 낯선 사내",
+    "type": "친일파",
+    "response": "사내가 책을 흘깃 보곤 코웃음을 쳤다.\n“책 나부랭이에 무엇이 적혔든. 너 같은 무지렁이가 상관할 일이 아니야.”",
+    "fx": null,
+    "result": "친일파",
     "code": "650",
-    "poster_img": "assets/img/poster/r02_c_sharpeyes.jpg",
-    "hint": null
+    "poster_img": "assets/img/poster/r02_c_gwonjunghyeon.jpg",
+    "hint": null,
+    "learn": "권중현 — 1905년 을사늑약 당시 농상공부대신으로 조약 체결에 찬성해 을사오적으로 꼽혔다. 이듬해에는 압록강·두만강의 삼림을 일본이 차지하도록 넘기는 협약을 맺어, 나라의 땅과 자원까지 팔았다. 1910년 한일병합 뒤 일본에게서 자작 작위와 중추원 고문 자리를 받았고, 노년에는 조선사편수회(우리 역사를 일본 입맛대로 고쳐 쓴 기구)의 고문까지 지냈다. 그 역시 아무런 처벌도 받지 않은 채 1934년 세상을 떠났다.",
+    "person": "권중현",
+    "born_died": "1854~1934",
+    "photo_img": "assets/img/photos/chinilpa/gwonjunghyeon.jpg"
    },
    {
     "pos": "우",
@@ -3182,7 +3202,11 @@
     "result": "복귀",
     "code": "899",
     "poster_img": "assets/img/poster/r02_r_ledger.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    }
   ],
   "R3": [
@@ -3195,7 +3219,11 @@
     "result": "복귀",
     "code": "726",
     "poster_img": "assets/img/poster/r03_l_laundry.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
@@ -3206,7 +3234,11 @@
     "result": "반전(9-2)",
     "code": "713",
     "poster_img": "assets/img/poster/r03_c_namjahyeon.jpg",
-    "hint": "“만주 벌판에서 온, 손끝이 붉은 여인을 만나게 될 거요.”"
+    "hint": "“만주 벌판에서 온, 손끝이 붉은 여인을 만나게 될 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "우",
@@ -3217,31 +3249,43 @@
     "result": "복귀",
     "code": "509",
     "poster_img": "assets/img/poster/r03_r_mourning.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    }
   ],
   "R4": [
    {
     "pos": "좌",
-    "appearance": "두툼한 가죽 장갑을 낀 손으로 짐을 부리는 상인",
-    "type": "위험",
-    "response": "상인이 짐 부리던 손을 뚝 멈췄다.\n“…손은 왜 묻나. 자네, 아까부터 사람들을 살피고 다니더군.”\n장사치의 말투가 아니었다. 저잣거리를 ‘살피는’ 자, 사복을 입은 순사였다.\n나는 태연한 척 값을 흥정하다, 틈을 보아 인파 속으로 몸을 숨겼다.",
-    "fx": "긴장(J)",
-    "result": "복귀",
+    "appearance": "잘 차려입고 거만한 태도로 손을 내젓는 사내",
+    "type": "친일파",
+    "response": "사내가 거들먹거리며 손을 내저었다.\n“부질없는 저항은 그만두게. 나는 진작 대세를 좇아 큰 결단을 내린 사람이야. 만세니 독립이니, 어리석은 소리지.”",
+    "fx": null,
+    "result": "친일파",
     "code": "739",
-    "poster_img": "assets/img/poster/r04_l_glovemerchant.jpg",
-    "hint": null
+    "poster_img": "assets/img/poster/r04_l_leewanyong.jpg",
+    "hint": null,
+    "learn": "이완용 — 을사늑약(1905) 때 학부대신으로 조약에 찬성했고, 1907년 내각총리대신이 되어 정미7조약과 대한제국 군대 해산을 주도했다. 1910년에는 총리대신으로서 순종 황제를 압박해 한일병합을 성사시켜, 나라를 통째로 일본에 넘긴 대표적 매국노다. 그 대가로 백작 작위(뒤에 후작으로 승작)와 막대한 재산을 얻었다. 1909년 이재명 의사의 칼에 찔려 죽을 뻔했으나 살아남았고, 끝내 처벌받지 않은 채 1926년 부귀를 누리다 세상을 떠났다.",
+    "person": "이완용",
+    "born_died": "1858~1926",
+    "photo_img": "assets/img/photos/chinilpa/leewanyong.jpg"
    },
    {
     "pos": "중",
-    "appearance": "한 손에 흰 붕대를 감은 순사",
-    "type": "위험",
-    "response": "순사가 눈을 치켜떴다.\n“네 이놈, 무엇을 캐고 다니느냐?”\n나는 얼른 고개를 숙이고 물러났다. 등에 식은땀이 흘렀다.",
-    "fx": "긴장(J)",
-    "result": "복귀",
+    "appearance": "값진 두루마기 차림에 한 손을 감춘 근엄한 사내",
+    "type": "친일파",
+    "response": "사내가 값진 두루마기 소매를 천천히 내렸다.\n“이 손? 나라를 위한 도장을 찍은 손일세. …한데 자네, 아까부터 무엇을 그리 캐고 다니는가?”",
+    "fx": null,
+    "result": "친일파",
     "code": "165",
-    "poster_img": "assets/img/poster/r04_c_bandagesunsa.jpg",
-    "hint": null
+    "poster_img": "assets/img/poster/r04_c_parkjesun.jpg",
+    "hint": null,
+    "learn": "박제순 — 1905년 을사늑약 당시 외부대신으로서, 대한제국의 외교권을 일본에 넘기는 그 조약 문서에 직접 서명한 당사자다. 이후 참정대신에 올랐고, 1910년 대한제국이 일본에 나라를 완전히 빼앗긴 뒤(한일병합)에는 일본에게서 자작 작위와 중추원 고문 자리를 받았다. 그는 끝내 아무런 처벌도 받지 않은 채, 죽을 때까지 그 작위와 자리를 누리며 해마다 일본이 주는 수당을 받다가 1916년 세상을 떠났다.",
+    "person": "박제순",
+    "born_died": "1858~1916",
+    "photo_img": "assets/img/photos/chinilpa/parkjesun.jpg"
    },
    {
     "pos": "우",
@@ -3252,7 +3296,11 @@
     "result": "반전(10-2)",
     "code": "321",
     "poster_img": "assets/img/poster/r04_r_anjunggeun.jpg",
-    "hint": "“저기, 왼손을 늘 소매 깊이 감춘, 눈빛이 형형한 사내가 있을 거요.”"
+    "hint": "“저기, 왼손을 늘 소매 깊이 감춘, 눈빛이 형형한 사내가 있을 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    }
   ],
   "R5": [
@@ -3265,7 +3313,11 @@
     "result": "반전(11-2)",
     "code": "892",
     "poster_img": "assets/img/poster/r05_l_kimmaria.jpg",
-    "hint": "“현해탄을 막 건너온, 곱게 차려입은 여인이 있을 거요.”"
+    "hint": "“현해탄을 막 건너온, 곱게 차려입은 여인이 있을 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
@@ -3276,18 +3328,26 @@
     "result": "복귀",
     "code": "859",
     "poster_img": "assets/img/poster/r05_c_baby.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "우",
-    "appearance": "팔 물건 보따리를 인 행상 여인",
-    "type": "평민",
-    "response": "여인이 보따리를 고쳐 안았다.\n“혼인은 무슨. 이 물건 팔아 입에 풀칠하기 바쁜데 무슨 소리요.”",
+    "appearance": "나루의 어두운 기모노 차림에 손가방을 든 여인",
+    "type": "친일파",
+    "response": "여인이 차갑게 웃으며 고개를 들었다.\n“혼인이라. 나를 거두어 주신 분은 저 바다 건너의 높으신 어른이시오. 그 덕에 나는 관아든 어디든 거침없이 드나든다오.”",
     "fx": null,
-    "result": "복귀",
+    "result": "친일파",
     "code": "388",
-    "poster_img": "assets/img/poster/r05_r_peddler.jpg",
-    "hint": null
+    "poster_img": "assets/img/poster/r05_r_baejeongja.jpg",
+    "hint": null,
+    "learn": "배정자 — 1887년 일본의 이토 히로부미의 양녀가 되어 이름까지 일본식으로 바꾸고, 밀정(정보원) 교육을 받았다. 조선에 돌아와 고종 황제에게 접근해 궁궐의 정치 정보를 빼내 일본에 넘겼고, 이후 일본 헌병대와 총독부 경무국의 촉탁으로서 만주·간도·상하이를 오가며 독립운동가를 잡아들이는 일까지 했다. 광복 뒤에는 숨어 지내다 1949년 반민족행위자로 붙잡혔고, 1952년 세상을 떠났다.",
+    "person": "배정자",
+    "born_died": "1870~1952",
+    "photo_img": "assets/img/photos/chinilpa/baejeongja.jpg"
    }
   ],
   "R6": [
@@ -3300,7 +3360,11 @@
     "result": "복귀",
     "code": "213",
     "poster_img": "assets/img/poster/r06_l_pedlaryouth.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
@@ -3311,18 +3375,26 @@
     "result": "반전(12-2)",
     "code": "455",
     "poster_img": "assets/img/poster/r06_c_yunbonggil.jpg",
-    "hint": "“저기, 충청도에서 온 젊은 사내를 찾으시오. 눈매가 곧은 얼굴이지요.”"
+    "hint": "“저기, 충청도에서 온 사내를 찾으시오. 눈매가 곧은 얼굴이지요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "우",
-    "appearance": "나루 끝에 앉아 짚신을 고쳐 신는 나그네 청년",
-    "type": "평민",
-    "response": "청년이 짚신 끈을 조여 매며 고개를 들었다.\n“고향 떠나 한양에 일자리 구하러 가는 길이오. 갈 길이 머니 어서 비켜 주시오.”",
+    "appearance": "잘 차려입고 짐꾼을 거느린 채 나루로 향하는 사내",
+    "type": "친일파",
+    "response": "잘 차려입은 사내가 짐꾼들을 지나쳐 나루로 향하다 돌아보았다.\n“집? 나는 큰 집과 넉넉한 녹을 받고 편히 지내는 몸일세. 나라야 어찌 되든, 내 앞길만 훤하면 그만 아닌가.”",
     "fx": null,
-    "result": "복귀",
+    "result": "친일파",
     "code": "797",
-    "poster_img": "assets/img/poster/r06_r_traveler.jpg",
-    "hint": null
+    "poster_img": "assets/img/poster/r06_r_leegeuntaek.jpg",
+    "hint": null,
+    "learn": "이근택 — 1905년 을사늑약 당시 군부대신으로 조약 체결을 주도해 을사오적으로 꼽혔다. 1910년 한일병합 뒤 일본에게서 자작 작위와 중추원 고문 자리를 받았고, 이듬해에는 나라를 판 대가로 은사공채 5만 원(오늘날 돈으로 수십억 원)을 받아 죽을 때까지 해마다 수당을 챙겼다. 그 역시 아무런 처벌도 받지 않은 채 1919년 세상을 떠났다.",
+    "person": "이근택",
+    "born_died": "1865~1919",
+    "photo_img": "assets/img/photos/chinilpa/leegeuntaek.jpg"
    }
   ],
   "R7": [
@@ -3335,7 +3407,11 @@
     "result": "복귀",
     "code": "267",
     "poster_img": "assets/img/poster/r07_l_prayingold.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
@@ -3346,7 +3422,11 @@
     "result": "복귀",
     "code": "921",
     "poster_img": "assets/img/poster/r07_c_lullaby.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "우",
@@ -3357,7 +3437,11 @@
     "result": "반전(13-2)",
     "code": "707",
     "poster_img": "assets/img/poster/r07_r_yunhuisun.jpg",
-    "hint": "“저 고갯길 쪽으로 가면, 나이 지긋한 아낙이 나직이 노래를 흥얼거리고 있을 거요.”"
+    "hint": "“저 고갯길 쪽으로 가면, 나이 지긋한 아낙이 나직이 노래를 흥얼거리고 있을 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    }
   ],
   "R8": [
@@ -3370,7 +3454,11 @@
     "result": "반전(14-2)",
     "code": "900",
     "poster_img": "assets/img/poster/r08_l_kimgu.jpg",
-    "hint": "“이 고개를 넘으면, 덩치가 큰 중년의 사내를 만날 거요.”"
+    "hint": "“이 고개를 넘으면, 덩치가 큰 중년의 사내를 만날 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
@@ -3381,18 +3469,26 @@
     "result": "복귀",
     "code": "743",
     "poster_img": "assets/img/poster/r08_c_drunk.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "우",
-    "appearance": "삿갓을 눌러쓰고 주막 안을 연신 살피는, 눈초리 매서운 사내",
-    "type": "위험",
-    "response": "사내가 삿갓 밑으로 눈을 치켜뜨며, 나를 위아래로 훑었다.\n“젊은이? 누굴 찾는 게요. 무슨 일로 그러시오?”\n순간 등골이 서늘했다. 나는 아무 일도 아니라는 듯 고개를 숙이고 슬그머니 물러났다.",
-    "fx": "긴장(J)",
-    "result": "복귀",
+    "appearance": "주막 평상에 거만히 앉은, 잘 차려입은 사내",
+    "type": "친일파",
+    "response": "평상에 거만히 앉은 사내가 코웃음을 쳤다.\n“젊은것이 어디로 갔든 내 알 바 아니네. 세상 물정 모르는 것들이나 독립을 외치지. 나는 진작 대세를 택한 몸이야.”",
+    "fx": null,
+    "result": "친일파",
     "code": "712",
-    "poster_img": "assets/img/poster/r08_r_hatman.jpg",
-    "hint": null
+    "poster_img": "assets/img/poster/r08_r_leejiyong.jpg",
+    "hint": null,
+    "learn": "이지용 — 1904년 외부대신서리로 한일의정서에 서명해 대한제국의 자주권을 일본에 묶이게 했고, 이듬해 을사늑약 때는 내부대신으로 조약 체결을 거들어 을사오적으로 꼽혔다. 1910년 한일병합 뒤 일본에게서 백작 작위와 중추원 고문 자리를 받았다. 이후 도박에 빠져 붙잡히는 바람에 한때 작위를 잃기도 했으나 곧 되찾았고, 나라를 판 죄로는 끝내 벌받지 않은 채 1928년 세상을 떠났다.",
+    "person": "이지용",
+    "born_died": "1870~1928",
+    "photo_img": "assets/img/photos/chinilpa/leejiyong.jpg"
    }
   ],
   "R9": [
@@ -3405,7 +3501,11 @@
     "result": "복귀",
     "code": "463",
     "poster_img": "assets/img/poster/r09_l_basket.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
@@ -3416,7 +3516,11 @@
     "result": "반전(15-2)",
     "code": "279",
     "poster_img": "assets/img/poster/r09_c_ankyeongsin.jpg",
-    "hint": "“이 길을 따라 저잣거리로 내려가면, 장옷을 깊이 눌러쓴 여인이 있을 거요.”"
+    "hint": "“이 길을 따라 저잣거리로 내려가면, 장옷을 깊이 눌러쓴 여인이 있을 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "우",
@@ -3427,7 +3531,11 @@
     "result": "복귀",
     "code": "934",
     "poster_img": "assets/img/poster/r09_r_packing.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    }
   ],
   "R10": [
@@ -3440,7 +3548,11 @@
     "result": "복귀",
     "code": "941",
     "poster_img": "assets/img/poster/r10_l_begging.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "중",
@@ -3451,7 +3563,11 @@
     "result": "복귀",
     "code": "306",
     "poster_img": "assets/img/poster/r10_c_wandering.jpg",
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "우",
@@ -3462,7 +3578,11 @@
     "result": "반전(16-2)",
     "code": "433",
     "poster_img": "assets/img/poster/r10_r_hanyongun.jpg",
-    "hint": "“이 길 끝 장터 한복판에, 장삼을 걸친 스님이 계실 거요.”"
+    "hint": "“이 길 끝 장터 한복판에, 장삼을 걸친 스님이 계실 거요.”",
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    }
   ],
   "도입": [
@@ -3475,7 +3595,11 @@
     "result": "장면5",
     "code": null,
     "poster_img": null,
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    },
    {
     "pos": "②",
@@ -3486,7 +3610,11 @@
     "result": "장면5",
     "code": null,
     "poster_img": null,
-    "hint": null
+    "hint": null,
+    "learn": null,
+    "person": null,
+    "born_died": null,
+    "photo_img": null
    }
   ]
  },

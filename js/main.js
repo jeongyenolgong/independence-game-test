@@ -179,7 +179,12 @@
   }
 
   // ---------- 게임 시작 ----------
+  // gen = 지금 돌고 있는 판의 번호. '시작'을 누를 때마다 하나 오른다.
+  // 옛 판이 남긴 '다음으로' 신호는 번호가 달라 무시된다(아래 nextFrom 참고).
+  let gen = 0;
+
   function startGame() {
+    gen++;
     window.G.met = new Set();
     window.G.flowIndex = 0;
     hide('screen-title');
@@ -190,12 +195,25 @@
   }
 
   // ---------- 진행 제어 ----------
-  function next() { window.G.flowIndex++; runFlow(); }
+  // 한 칸에서 '다음으로'는 **한 번만** 먹는다. 예전엔 아무나 next()를 부르면 그대로
+  // 한 칸이 넘어가서, 진행이 두 갈래로 돌기 시작하면(시작 버튼이 두 번 먹히는 등)
+  // 코드를 안 넣었는데도 화면이 저 혼자 넘어가고, 버려진 찾기 화면이 다음 화면
+  // 뒤에 그대로 남아 비쳤다(2026-07-27 사용자 제보).
+  // 그래서 '몇 판째(gen)의 몇 번째 칸(i)에서 나온 신호인지'를 표에 적어 두고,
+  // 지금 자리와 어긋나는 신호는 조용히 버린다.
+  function nextFrom(g, i) {
+    return function () {
+      if (g !== gen || window.G.flowIndex !== i) return;   // 옛 판·지난 칸의 신호 = 무시
+      window.G.flowIndex++;
+      runFlow();
+    };
+  }
 
   function runFlow() {
     const flow = window.G.data.flow;
     if (window.G.flowIndex >= flow.length) { Main.toTitle(); return; }
     const node = flow[window.G.flowIndex];
+    const next = nextFrom(gen, window.G.flowIndex);
     switch (node.type) {
       case 'scene':
         Engine.playScene(node.id, next); break;

@@ -99,6 +99,42 @@
     v.classList.remove('is-out');
   }
 
+  // ---------- 친일파 ③ 유화·사진 대조 ----------
+  // 학습창(닫기✓)이 완전히 닫힌 뒤, 그 인물이 나온 릴레이 배경을 dim으로 깔고
+  // 유화(게임 속 위장·색) | 실제 사진(역사 기록·흑백) 나란히 + 이름(생몰년)만 띄운다.
+  // 화면을 누르면(▼) 닫히고 찾기로 복귀. 지어낸 타이틀·라벨 없음(사용자 확정 §5-4).
+  function chinilpaCompare(o) {
+    return new Promise((resolve) => {
+      const st = $('stage');
+      const old = $('chinilpa-compare');
+      if (old) old.remove();
+      const ov = document.createElement('div');
+      ov.id = 'chinilpa-compare';
+      ov.className = 'chinilpa-compare';
+      ov.innerHTML =
+        '<div class="cc-pair">' +
+          '<img class="cc-oil" alt="">' +
+          '<div class="cc-photo-frame"><img class="cc-photo" alt=""></div>' +
+        '</div>' +
+        '<p class="cc-name"></p>' +
+        '<span class="cc-cont cont-indicator">▼</span>';
+      ov.querySelector('.cc-oil').src = o.poster_img;
+      ov.querySelector('.cc-photo').src = o.photo_img;
+      ov.querySelector('.cc-name').textContent =
+        (o.person || '') + (o.born_died ? ' (' + o.born_died + ')' : '');
+      st.appendChild(ov);
+      void ov.offsetWidth; ov.classList.add('is-in');
+      function close(e) {
+        if (e) e.stopPropagation();
+        ov.removeEventListener('click', close);
+        ov.classList.remove('is-in'); ov.classList.add('is-out');
+        setTimeout(() => { ov.remove(); resolve(); }, 500);
+      }
+      // 페이드 인이 끝난 뒤에야 탭을 받는다(대사 넘기려던 손이 곧장 닫지 않게).
+      setTimeout(() => ov.addEventListener('click', close), 650);
+    });
+  }
+
   // ---------- 무대 세팅 = 배경 그림 ----------
   // staging.bg_img 칸에 적힌 그림을 그 장면 배경으로 깐다. 비어 있으면(아직 안 그려진
   // 장소) 회색 그라데이션 플레이스홀더로 남는다 — 섞여 있어도 화면이 깨지지 않게.
@@ -482,8 +518,7 @@
   }
 
   Engine.playFind = function (relay, onDone) {
-    const layer = $('find-layer'), slots = $('find-slots'),
-      codeEl = $('find-code'), pad = $('find-pad');
+    const layer = $('find-layer'), slots = $('find-slots'), codeEl = $('find-code');
     const L = window.G.data.labels || {};
     const opts = window.G.data.choices[relay] || [];
     const here = +(/^R(\d+)$/.exec(relay) || [])[1];
@@ -523,8 +558,6 @@
     // 화면 아래를 크게 먹으면서 포스터 자리를 눌렀다. 진짜 <input>이라 붙여넣기·백스페이스·
     // 하드웨어 키보드가 전부 공짜로 따라온다.
     function buildInput() {
-      pad.innerHTML = '';
-      pad.classList.add('hidden');   // 자리까지 회수(.hidden = display:none)
       codeEl.innerHTML = '';
       const el = document.createElement('input');
       el.className = 'find-input';
@@ -607,6 +640,23 @@
         if (onDone) onDone();
         return;
       }
+
+      // 친일파 = 찾기 화면에 숨은 매국노. 벌점 없이 배우고 돌아온다:
+      //   ① 정체를 드러내는 반응 대사(미끼와 같은 자리·타자기)
+      //   → ② 학습창(독립운동가 학습 패널 그대로 계승, §5-3 문구)
+      //   → ③ 유화·사진 대조(그 릴레이 배경 dim 위에 유화 | 실제 사진 + 이름·생몰)
+      //   → 묘사로 복귀. 초상(반전)도 다음 진행도 없다 — 정답이 아니므로.
+      if (o.type === '친일파') {
+        if (!filled.has(hitCode)) { fillSlot(o, false); filled.add(hitCode); }
+        if (o.response) await typewriter(o.response, 'narr');
+        $('dialogue-box').classList.add('hidden');
+        await Engine.learnPanel([o.learn]);
+        await chinilpaCompare(o);
+        showStatic(hint);
+        lock(false);
+        return;
+      }
+
       if (!filled.has(hitCode)) { fillSlot(o, false); filled.add(hitCode); }
       // ② 이 장면 오답 = 얼굴 삽입 → 기존 오답 대사 → 묘사 복귀
       if (o.response) await typewriter(o.response, o.type === '위험' ? 'emph' : 'narr');
@@ -673,7 +723,7 @@
     // 데이터가 없으면(안전) 바로 통과
     if (!q || !q.cards || !q.cards.length) { if (onDone) onDone(); return; }
 
-    const layer = $('find-layer'), codeEl = $('find-code'), pad = $('find-pad'),
+    const layer = $('find-layer'), codeEl = $('find-code'),
       slots = $('find-slots'), box = $('dialogue-box');
     let busy = false;
 
@@ -686,8 +736,13 @@
     $('find-prompt').textContent =
       (L['quiz.find_q'] || '{인물}에 관한 정보로 올바른 것을 찾아 코드를 입력하세요').replace('{인물}', person);
 
+    // 해설 타이머는 입력칸보다 **먼저** 선언한다. 아래 input.focus()가 focus 이벤트를
+    // 그 자리에서 쏘고, 그 핸들러(hideHaeseol)가 이 변수를 읽기 때문이다. 선언이 뒤에
+    // 있으면 "Cannot access 'haeTimer' before initialization"으로 playQuiz가 통째로
+    // 죽어, 퀴즈 화면이 뜬 채 코드를 쳐도 아무 반응이 없었다(2026-07-27).
+    let haeTimer = null;
+
     // 입력칸(진짜 <input>) — 포스터 찾기와 동일 방식(숫자 3자리·세 자리째 자동 판정)
-    pad.innerHTML = ''; pad.classList.add('hidden');
     codeEl.innerHTML = '';
     const input = document.createElement('input');
     input.className = 'find-input';
@@ -710,7 +765,6 @@
     input.focus();
 
     // 해설(대사창) — 오답 카드일 때만. 질문·입력칸은 그대로 남기고, 다른 대사처럼 타자기로 흐른다.
-    let haeTimer = null;
     function hideHaeseol() {
       if (haeTimer) { clearInterval(haeTimer); haeTimer = null; }
       box.classList.add('hidden'); box.onclick = null; $('dialogue-text').textContent = '';
