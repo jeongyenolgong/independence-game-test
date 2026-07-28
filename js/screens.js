@@ -98,6 +98,9 @@
     });
 
     pLayer.classList.remove('hidden');
+    // 자막이 금빛 배경에 묻히지 않도록 인물 자리에만 어둠을 깐다(style.css .montage-dim).
+    // 몽타주에만 붙였다 떼는 이유: 이 층은 본편 D 반전에서도 쓰기 때문이다.
+    pLayer.classList.add('montage-dim');
     // 도입 내레이션
     await type(narr[0], 'narr');
 
@@ -179,6 +182,7 @@
     // L3 주제 봉인
     pLayer.innerHTML = '';
     pLayer.classList.add('hidden');
+    pLayer.classList.remove('montage-dim');   // 어둠도 함께 걷는다(결과 화면까지 남지 않게)
     for (const line of theme) await type(line, 'narr');
     // 마지막 대사가 끝나자마자 결과 화면이 튀어나와 여운이 없었다(사용자 지적).
     // 대사창이 먼저 조용히 걷히고 → 한 박자 비운 뒤 → 결과 화면으로 넘긴다.
