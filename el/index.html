@@ -25,6 +25,9 @@
                autocapitalize="off" spellcheck="false" maxlength="20">
         <button id="btn-start" class="btn-primary">확인</button>
       </div>
+      <!-- 이어하기 — 저장된 진행이 있을 때만 main.js가 hidden을 벗긴다. 암구호 밖에 두는 건
+           일부러다: 끊긴 판을 되살리는 자리라 문턱을 하나 더 두지 않는다(사용자 확정). -->
+      <button id="btn-resume" class="btn-resume hidden">이어하기</button>
     </div>
   </section>
 
@@ -55,6 +58,18 @@
 
     <!-- 선택지 층(도입 2택) -->
     <div id="choice-layer" class="choice-layer hidden"></div>
+
+    <!-- 인물 퀴즈에서만 뜨는 상시 학습판 — 코드를 치는 동안 앞서 읽은 학습 글을 다시 볼 수 있게
+         화면에 그대로 띄워 둔다(버튼으로 여는 방식은 폐기, 사용자 확정 2026-07-28).
+         자리는 화면 맨 위 — 아래쪽은 소프트 키보드가 덮으므로 쓸 수 없다. -->
+    <div id="quiz-learn" class="quiz-learn hidden">
+      <div id="quiz-learn-text" class="quiz-learn-text"></div>
+      <div class="quiz-learn-nav">
+        <button id="quiz-learn-prev" type="button">◀ 이전</button>
+        <span id="quiz-learn-progress"></span>
+        <button id="quiz-learn-next" type="button">다음 ▶</button>
+      </div>
+    </div>
 
     <!-- 인물 찾기 층(포스터 코드 입력) — 대사창과 나란히 서야 해서 흐름 안에 둔다 -->
     <div id="find-layer" class="find-layer hidden">

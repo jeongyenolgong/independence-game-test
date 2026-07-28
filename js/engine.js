@@ -430,6 +430,55 @@
     if (onDone) onDone();
   };
 
+  // ---------- 인물 퀴즈 상시 학습판 ----------
+  // 이 퀴즈 앞에서 읽은 학습 글을 그대로 모은다. 흐름에서 바로 앞 '찾기'까지 거슬러 올라가며
+  // 그 사이 장면들의 학습 줄만 (그 학년 것으로) 줍는다 — 장면 이름 규칙(◯-3)을 짐작하지 않는다.
+  // 원고가 바뀌어 학습 줄이 다른 장면으로 옮겨 가도 따라간다.
+  function quizLearnPages(sceneId) {
+    const flow = window.G.data.flow, ids = [], out = [];
+    let qi = -1;
+    flow.forEach((n, i) => { if (n.type === 'quiz' && n.scene === sceneId) qi = i; });
+    for (let i = qi - 1; i >= 0; i--) {
+      if (flow[i].type === 'find') break;
+      if (flow[i].type === 'scene') ids.unshift(flow[i].id);
+    }
+    ids.forEach((id) => (window.G.data.scenes[id] || []).forEach((ln) => {
+      if (ln.kind === '학습' && (ln.aud === '공통' || ln.aud === window.G.grade)) out.push(ln.text);
+    }));
+    return out;
+  }
+
+  // 판을 세우고 넘김을 걸어 준다. 글이 없으면(있을 리 없지만) 조용히 안 띄운다.
+  function quizLearnOpen(sceneId) {
+    const panel = $('quiz-learn'), txt = $('quiz-learn-text'),
+      prev = $('quiz-learn-prev'), next = $('quiz-learn-next'), prog = $('quiz-learn-progress');
+    const pages = quizLearnPages(sceneId);
+    if (!pages.length) { panel.classList.add('hidden'); return; }
+    let p = 0;
+    function render() {
+      txt.innerHTML = pages[p].replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+      prog.textContent = (p + 1) + ' / ' + pages.length;
+      prev.disabled = (p === 0);
+      next.disabled = (p === pages.length - 1);
+      txt.scrollTop = 0;
+    }
+    // 판 위의 탭이 화면 전체 '다음으로' 탭으로 새 나가면 퀴즈가 저 혼자 넘어간다.
+    ['pointerdown', 'mousedown', 'touchstart', 'click'].forEach((ev) =>
+      panel.addEventListener(ev, (e) => e.stopPropagation()));
+    prev.onclick = () => { if (p > 0) { p--; render(); } };
+    next.onclick = () => { if (p < pages.length - 1) { p++; render(); } };
+    render();
+    panel.classList.remove('hidden');
+  }
+
+  function quizLearnClose() {
+    const panel = $('quiz-learn');
+    panel.classList.add('hidden');
+    panel.classList.remove('is-leaving');
+    $('quiz-learn-prev').onclick = $('quiz-learn-next').onclick = null;
+    $('quiz-learn-text').innerHTML = '';
+  }
+
   // ---------- 학습 패널(A₂) ----------
   Engine.learnPanel = function (pages) {
     return new Promise((resolve) => {
@@ -733,6 +782,7 @@
     layer.classList.add('quiz-mode');                  // 슬롯 숨김 + 키보드 위로 고정(CSS)
     box.classList.add('hidden');
     slots.innerHTML = '';
+    quizLearnOpen(sceneId);                            // 앞서 읽은 학습 글을 화면에 띄워 둔다
     $('find-prompt').textContent =
       (L['quiz.find_q'] || '{인물}에 관한 정보로 올바른 것을 찾아 코드를 입력하세요').replace('{인물}', person);
 
@@ -794,10 +844,12 @@
       input.classList.add('is-correct');   // 입력한 코드가 보인 채 옅은 정답 강조
       await pause(900);                     // 판정 박자(0.4) + 강조 유지(0.5)
       layer.classList.add('is-leaving');    // 0.4초 페이드 아웃
+      $('quiz-learn').classList.add('is-leaving');   // 학습판도 같은 박자로 함께 사라진다
       await pause(400);
       layer.classList.add('hidden');
       layer.classList.remove('quiz-mode', 'is-leaving');
       box.classList.add('hidden');
+      quizLearnClose();                     // 학습판도 같이 걷는다(다음 장면에 남으면 안 된다)
       if (onDone) onDone();                 // 다음 장면(◯-5)이 이어서 자체 전환으로 열린다
     }
 

@@ -103,9 +103,16 @@ body{
 
 /* 시작 암구호 — 이 칸을 통과해야 게임이 열린다(사용자 확정 2026-07-20).
    조작 UI라 코드 입력 키패드·선택지와 같은 종이 언어를 쓴다. */
+/* 첫 화면의 두 폭. 입력칸은 글을 받는 칸이고 버튼은 누르는 것이라 서로 맞출 이유가 없다
+   (사용자 지적 2026-07-28). 대신 **버튼 둘(확인·이어하기)은 크기가 같아야** 한다 —
+   --btn-w 한 곳만 고치면 둘이 같이 움직인다. 값은 넉 자('이어하기')가 갇히지 않는 선. */
+.title-inner{ --gate-w:min(78vw,290px); --btn-w:min(52vw,160px); }
 .gate{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+/* ⚠️.btn-primary는 확인·설정닫기·계속·저장·종료 다섯 버튼이 함께 쓰는 규칙이다.
+   폭을 거기 넣으면 다른 화면 버튼까지 넓어지므로, 첫 화면 안(.gate)으로만 좁혀 준다. */
+.gate .btn-primary{ width:var(--btn-w); }
 .gate-input{ font-family:var(--dlg-font); font-size:17px; letter-spacing:2px;
-  text-align:center; width:min(78vw,290px); padding:13px 16px;
+  text-align:center; width:var(--gate-w); padding:13px 16px;
   color:var(--ink-paper); background:rgba(var(--paper-rgb),.93);
   border:1px solid rgba(var(--ink-line),.45); border-radius:2px;
   box-shadow:0 2px 8px rgba(0,0,0,.35); }
@@ -113,6 +120,15 @@ body{
 .gate-input::placeholder{ color:var(--ink-soft); opacity:.75; letter-spacing:1px; }
 .gate-input:focus{ outline:none; border-color:rgba(var(--ink-line),.85); }
 .gate-input.is-wrong{ animation:shake .45s; border-color:var(--crimson); }
+
+/* 이어하기 — 저장된 진행이 있을 때만 뜬다. 암구호 칸이 주(主)라, 이쪽은 종이색을 채우지 않고
+   테두리만 두른 한 톤 낮은 차림으로 둔다. 두 개가 나란히 종이색이면 어느 쪽이 시작인지 흐려진다.
+   손끝으로 눌러야 하니 높이는 44px 아래로 내려가지 않게 padding을 잡는다(태블릿). */
+.btn-resume{ display:block; width:var(--btn-w); margin:22px auto 0; padding:14px 0; cursor:pointer;
+  font-family:var(--dlg-font); font-size:16px; letter-spacing:3px; color:var(--paper);
+  background:rgba(20,16,9,.42); border:1px solid rgba(var(--paper-rgb),.5); border-radius:2px;
+  text-shadow:0 1px 6px #000; }
+.btn-resume:active{ background:rgba(20,16,9,.62); transform:translateY(1px); }
 
 /* ---------- 인게임 무대 ---------- */
 #stage{ justify-content:flex-end; }
@@ -405,6 +421,21 @@ body{
   background-image:repeating-linear-gradient(0deg,transparent 0 30px,rgba(0,0,0,.04) 30px 31px); }
 /* 학습창 — 글은 위, 넘김 줄은 판 맨 아래. 페이지를 넘겨도 버튼이 제자리에 있다. */
 .learn-inner{ justify-content:space-between; }
+/* 학습창 높이는 위 480px에서 떼어 낸다(사용자 지적 2026-07-28: 글에 비해 여백이 너무 많다).
+   480px은 지금은 없어진 옛 OX·4지선다 퀴즈까지 함께 세우려던 값이라, 학습 글에는 과했다.
+   → **학년별로 그 학년의 가장 긴 학습 글**에 맞춘다. 실제로 재 본 값(가장 긴 쪽 기준):
+       초등 347px(744높이)·364px(800)·371px(823 이상)  ← 14-3 안중근
+       중등 309px(744)·323px(800)·371px(823 이상)      ← 11-3·13-3·14-3
+   글자 크기가 clamp(…,2.55vh,21px)로 화면 높이를 따라가므로 vh로 잡되, 21px에서 글자가
+   멈추는 823px 위부터는 px 상한이 받는다. 여기에 여유 한 뼘(약 3%)을 얹은 값이다.
+   ※min-height는 바닥이지 뚜껑이 아니다 — 친일파 학습 글(가장 길어 460~539px)은 이 값을
+     넘어 스스로 커진다. 잘리지 않으며, max-height 84vh가 화면 밖으로 나가는 것만 막는다.
+   ⚠️기본값을 body에 두는 이유: 학년 표시(body[data-grade])는 game.json을 받은 뒤에야 붙는다.
+     그 전에 480px 같은 다른 값으로 떨어지면 학습창 높이가 두 갈래가 된다. 기본을 초등 값으로
+     두고 중등만 덮어쓰면, 어느 시점에 재도 학습창은 늘 이 둘 중 하나다. */
+body{ --learn-min-h:min(48vh,376px); }                    /* 기본 = 초등 */
+body[data-grade="중등"]{ --learn-min-h:min(43vh,376px); }
+.learn-inner{ min-height:var(--learn-min-h); }
 .learn-text{ font-size:clamp(16px,2.55vh,21px); line-height:2; letter-spacing:.3px; min-height:120px; }
 .learn-text b{ color:var(--crimson); font-weight:700; }
 .learn-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:18px;

@@ -117,8 +117,45 @@
    (모을 사람이 아니라 정답 카드 하나를 고르는 것). 질문 종이판(.find-prompt)+입력칸만 남긴다.
    위치: 타이핑 때 소프트 키보드(아이패드 미니 가로 ≈353px)가 입력칸을 덮지 않도록 위로 고정.
    position:absolute라 아래 대사창(해설)이 떠도 질문·입력칸이 움직이지 않는다(사용자 확정). */
-.find-layer.quiz-mode{ position:absolute; left:0; right:0; top:31%; margin:0 14px; }
+/* ⚠️top은 아래 --quiz-learn-h(상시 학습판 높이)에 물려 있다. 학습판이 화면 맨 위를 차지하고
+   퀴즈 덩어리가 그 바로 아래에 앉는 구조라, 판 높이를 바꾸면 이 자리도 같이 움직여야 한다.
+   예전 31%(=744화면에서 231px)를 그대로 두면 학습판과 질문 줄이 겹친다. */
+.find-layer.quiz-mode{ position:absolute; left:0; right:0; margin:0 14px;
+  top:calc(var(--quiz-learn-top) + var(--quiz-learn-h) + 10px); }
 .find-layer.quiz-mode .find-slots{ display:none; }
+
+/* ---------- 인물 퀴즈 상시 학습판 (2026-07-28 사용자 확정 '라안') ----------
+   코드를 치는 동안 앞서 읽은 학습 글을 다시 볼 수 있어야 한다는 요구. '학습창 열기' 버튼을
+   두는 안은 폐기하고 화면에 그냥 띄운다. 인물마다 4~6쪽이라 넘김 줄이 판 안에 함께 있다.
+
+   높이(--quiz-learn-h)를 정한 근거 — 20개 조합(초·중 × 인물 10)의 **모든 쪽**을 세 화면
+   크기에서 재서, 스크롤 없이 들어가는 데 필요한 값:
+       744높이: 초등 228px(최악 김구 149자) · 중등 196px(김마리아)
+       800높이: 초등 239px(김구) · 중등 239px(한용운)
+       823 이상: 243px(글자가 18px에서 멈춘다)
+   → min(31vh,246px)이 세 크기 모두를 덮는 가장 작은 값이다. 더 키우면 아래 입력칸이
+     소프트 키보드(≈353px)에 가까워지고, 더 줄이면 긴 쪽이 판 안에서 스크롤된다.
+   ※학년별로 가르지 않은 이유: 필요한 vh가 30 대 31로 사실상 같다. */
+:root{ --quiz-learn-top:6px; --quiz-learn-h:min(31vh,246px); }
+.quiz-learn{ position:absolute; z-index:28; left:50%; transform:translateX(-50%);
+  top:var(--quiz-learn-top); width:var(--panel-w); height:var(--quiz-learn-h);
+  display:flex; flex-direction:column; padding:14px 20px 8px;
+  background:var(--paper); color:#241c10; border:2px solid #3a2c14; border-radius:6px;
+  box-shadow:0 8px 26px rgba(0,0,0,.5);
+  background-image:repeating-linear-gradient(0deg,transparent 0 30px,rgba(0,0,0,.04) 30px 31px); }
+/* 글자는 학습창(팝업)보다 한 톤 작다 — 팝업은 그 글만 읽는 자리지만 여기는 질문·입력칸과
+   한 화면을 나눠 쓰기 때문이다. overflow는 안전장치이지 평소에 걸리는 길이 아니다(위 근거). */
+.quiz-learn-text{ flex:1; overflow-y:auto; letter-spacing:.3px; line-height:1.95;
+  font-size:clamp(14px,2.2vh,18px); }
+.quiz-learn-text b{ color:var(--crimson); font-weight:700; }
+.quiz-learn-nav{ display:flex; justify-content:space-between; align-items:center;
+  border-top:1px solid #cbb98f; margin-top:8px; padding-top:6px; font-size:13px; }
+.quiz-learn-nav button{ font-family:var(--dlg-font); font-size:13px; color:#241c10;
+  background:transparent; border:1px solid #b8a06a; border-radius:3px;
+  padding:5px 12px; cursor:pointer; }
+.quiz-learn-nav button:disabled{ opacity:.35; cursor:default; }
+/* 정답을 맞혀 퀴즈 층이 물러날 때 학습판도 같은 0.4초로 함께 사라진다(혼자 툭 꺼지지 않게) */
+.quiz-learn.is-leaving{ transition:opacity .4s ease; opacity:0; }
 
 /* 코드입력 퀴즈 — 정답 박자·전환 (2026-07-23 사용자 확정 타이밍) */
 /* 정답 입력칸 강조: 초록이 아니라 먹선 링(종이 스킨 A2 규칙과 같은 결). 0.9초 보였다가 사라진다. */
