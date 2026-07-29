@@ -132,27 +132,31 @@
       const token = tokenImg
         ? '<div class="tokenimg"><img src="' + tokenImg + '" alt=""></div>'
         : '';
-      // ① 유화 포스터 → 실제 사진 크로스페이드.
-      //    게임 내내 이 사람의 얼굴은 그림이었다. 리빌 순간 그 그림이 걷히고 진짜 얼굴이
-      //    남는다 = '이야기 속 인물'에서 '실제로 살았던 사람'으로 건너가는 이음매.
-      //    포스터를 .montage-portrait 밖(형제)에 겹치는 이유: 안에 넣으면 그 상자의
-      //    filter:grayscale(1)에 걸려 유화까지 흑백이 된다. 색이 빠지는 것이 연출의 핵심이다.
+      // ① 유화 포스터 | 실제 사진 나란히 (사용자 확정 2026-07-29).
+      //    게임 내내 이 사람의 얼굴은 그림이었다. 리빌 순간 그 옆에 진짜 얼굴이 밝아지며
+      //    함께 선다 = '이야기 속 인물'과 '실제로 살았던 사람'이 한 화면에 놓이는 이음매.
+      //    예전엔 유화를 사진 위에 겹쳐 두었다가 지우는 크로스페이드였는데(.mp-stack),
+      //    그러면 리빌이 끝난 뒤 유화가 화면에서 사라졌다 — 두 얼굴을 견주게 하려면 남아야 한다.
+      //    유화를 .montage-portrait 밖에 두는 이유는 그대로다: 안에 넣으면 그 상자의
+      //    filter:grayscale(1)에 걸려 유화까지 흑백이 된다(색이 있어야 그림으로 읽힌다).
       const poster = posterOf[row.person];
       pLayer.innerHTML =
         '<div class="montage-group">' +
         '  <div class="namecap"></div>' +
-        '  <div class="mp-stack">' +
+        '  <div class="mp-pair">' +
+        '    <div class="mp-oil">' +
+        (poster ? '<img src="' + poster + '" alt="">' : '') +
+        '    </div>' +
         '    <div class="montage-portrait">' +
         (photo ? '<img src="' + photo + '" alt="">' : '') +
         '    </div>' +
-        (poster ? '<img class="mp-poster" src="' + poster + '" alt="">' : '') +
         '  </div>' +
         script + token +
         '  <div class="tokencap"></div>' +
         '</div>';
       const grp = pLayer.querySelector('.montage-group');
       const port = grp.querySelector('.montage-portrait');
-      const stack = grp.querySelector('.mp-stack');
+      const pair = grp.querySelector('.mp-pair');
       cLayer.classList.add('hidden');   // 몽타주는 캡션층을 안 쓴다(장소 자막 전용)
 
       // ── ② 리빌 ── 절이 완성되는 '그 순간'. 탭을 기다리지 않는다.
@@ -165,11 +169,11 @@
       grp.querySelector('.namecap').textContent = row.name_caption || '';
       grp.querySelector('.tokencap').textContent = row.caption || '';
       port.classList.add('revived');
-      stack.classList.add('to-photo');   // 유화가 걷히고 실제 사진이 남는다(1.2초)
+      pair.classList.add('open');   // 눌러 두었던 사진에 빛이 든다(1.1초)
       grp.classList.add('named');   // 자막 한 번에 또렷이(타이핑 X = 반전 임팩트)
 
-      // 700ms였다. 크로스페이드(1.2초)가 다 넘어가기 전에 탭이 먹으면 그림이 걷히다 만
-      // 채로 다음 인물로 넘어가, 이 연출이 아예 안 보인다 → 페이드가 끝난 뒤로 미룬다.
+      // 700ms였다. 사진이 다 밝아지기 전에 탭이 먹으면 밝아지다 만 채로 다음 인물로
+      // 넘어가, 이 연출이 아예 안 보인다 → 밝아짐이 끝난 뒤로 미룬다.
       await waitTapAfter(1300);   // 리빌 착지 여음 뒤 탭 = 다음 인물
 
       // ── ③ 스쳐 지나감 ── 금빛이 스러지며 왼쪽 아래 물결로 흘러 군중에 섞인다.

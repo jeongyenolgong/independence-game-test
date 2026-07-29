@@ -8,9 +8,13 @@
    .bg-prev.is-fading의 디졸브 .8s)에 각각 박혀 있어, 한쪽만 고치면 배경 색과
    그림이 서로 다른 속도로 넘어갔다. 아래 --bg-fade 하나가 둘 다를 지배한다.
    ※.bg의 filter .5s는 일부러 뺐다 — 그건 배경 갈아끼움이 아니라 fx(블러·긴장)용. */
-:root{ --bg-fade:2.4s; }
+/* 2.4s → 3.2s, 그리고 가속곡선을 ease → ease-in-out (사용자 지적 2026-07-29: 장소 전환이
+   너무 빠르다). 실제로 재 보니 2.4초는 제대로 돌고 있었는데, `ease`가 앞으로 쏠린 곡선이라
+   0.9초에 이미 65%가 지워지고 1.5초면 90%가 사라졌다 — 시간은 2.4초인데 체감은 1초대였다.
+   ease-in-out은 한가운데(1.6초)에서 반쯤 남아, 두 그림이 겹치는 구간이 눈에 남는다. */
+:root{ --bg-fade:3.2s; }
 .bg{ transition:filter .5s, background-color var(--bg-fade); }
-.bg-prev.is-fading{ animation:bgdissolve var(--bg-fade) ease forwards; }
+.bg-prev.is-fading{ animation:bgdissolve var(--bg-fade) ease-in-out forwards; }
 
 /* ---------- ① 코드 입력 = 진짜 input ----------
    자체 숫자키패드는 걷어냈다(껍데기 DOM·CSS까지 2026-07-27 삭제). 기기 자판을 그대로 쓴다
@@ -56,16 +60,38 @@
 @keyframes fxblack-in{  from{ opacity:0 } to{ opacity:1 } }
 @keyframes fxblack-out{ from{ opacity:1 } to{ opacity:0 } }
 
-/* ---------- ⑥ 엔딩 몽타주 = 유화 포스터 → 실제 사진 크로스페이드 ----------
-   포스터를 .montage-portrait **안**이 아니라 형제로 겹친다. 안에 넣으면
-   그 상자의 filter:grayscale(1)에 걸려 유화가 흑백으로 나온다 — 색이 빠지는 것이
-   이 연출의 핵심(그림의 색 → 사진의 흑백)이라 밖에 두어야 한다. */
-.mp-stack{ position:relative; flex:0 0 auto; }
-.mp-poster{ position:absolute; inset:0; width:100%; height:100%;
-  object-fit:cover; object-position:50% 18%;   /* 포스터 2:3 → 상자 5:6, 얼굴 안 잘리게 위로 */
-  border-radius:12px; border:2px solid #444; box-sizing:border-box;
-  display:block; opacity:1; transition:opacity 1.2s ease; }
-.mp-stack.to-photo .mp-poster{ opacity:0; }
+/* ---------- ⑥ 엔딩 몽타주 = 유화 포스터 | 실제 사진 나란히 (사용자 확정 2026-07-29) ----------
+   예전엔 두 장을 같은 자리에 겹쳐 놓고 유화를 지워 사진을 드러내는 크로스페이드였다
+   (.mp-stack / .mp-poster). 그림이 걷히는 순간 유화는 화면에서 사라졌다.
+   → 두 장을 옆으로 벌려 **끝까지 함께 남긴다**. 게임 속 얼굴(유화)과 실제로 살았던
+     사람(사진)이 한 화면에 나란히 서는 것이 리빌이 된다.
+   리빌 전에도 두 장 다 보인다(안3). 사진만 눌러 두었다가 그 순간 밝아진다 —
+   '없던 것이 나타난다'가 아니라 '있던 것에 빛이 든다'. */
+.mp-pair{ display:flex; align-items:flex-end; justify-content:center;
+  gap:clamp(10px,1.6vw,18px); flex:0 0 auto; }
+/* 두 장 같은 높이(유화 2:3 · 사진 5:6이라 폭은 저절로 달라진다).
+   한 장일 때(clamp(190px,32.2vh,260px))보다 낮춘다 — 두 장이 옆으로 서면서 덩어리가
+   가로·세로로 커져, 그대로 두면 이름 자막이 화면 위 밝은 하늘로 밀려 묻힌다. */
+.mp-pair .mp-oil, .mp-pair .montage-portrait{
+  height:clamp(160px,27vh,220px); width:auto; }
+.mp-oil{ aspect-ratio:2/3; border-radius:12px; border:2px solid #444; box-sizing:border-box;
+  overflow:hidden; flex:0 0 auto; background:#1a1510; }
+.mp-oil img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* 사진은 리빌 전까지 눌러 둔다. .montage-portrait의 grayscale은 style.css가 이미 걸어 두었고,
+   여기서는 밝기만 더 눌렀다 푼다 — filter를 통째로 다시 쓰면 흑백이 풀려 버린다. */
+.mp-pair .montage-portrait{ filter:grayscale(1) contrast(1.05) brightness(.34);
+  transition:filter 1.1s ease, box-shadow 1s, border-color 1s; }
+.mp-pair.open .montage-portrait{ filter:grayscale(1) contrast(1.05) brightness(1); }
+/* 금빛 부활은 style.css .montage-portrait.revived가 맡는다. 그 규칙의 filter가
+   이 파일 뒤에 오지 못하므로(같은 특정도·앞 파일) 밝기까지 여기서 마저 적어 준다. */
+.mp-pair.open .montage-portrait.revived{
+  filter:grayscale(1) brightness(1.08) contrast(1.12); }
+
+/* 인물 자리 어둠(.montage-dim)도 넓힌다 — 덩어리가 가로로 커져 지금 타원(44%×62%) 밖으로
+   이름·설명이 새어 나간다. 세로 중심도 46%로 올려, 맨 위 이름 자막까지 어둠이 받치게 한다. */
+.portrait-layer.montage-dim::before{
+  background:radial-gradient(ellipse 54% 74% at 50% 46%,
+    rgba(8,6,4,.88) 0%, rgba(8,6,4,.70) 46%, rgba(8,6,4,0) 80%); }
 
 /* ---------- ⑦ 도감 배경 = 지금 서 있는 장면 ----------
    검은 단색(#141009) 대신 현재 배경 그림이 비친다. screens.js가 --codex-bg를 넣는다.

@@ -24,8 +24,9 @@
     const GRADES = { el: '초등', md: '중등', '초등': '초등', '중등': '중등' };
     const raw = window.__GRADE || new URLSearchParams(location.search).get('grade');
     window.G.grade = GRADES[raw] || '초등';
-    // 학습창 높이가 학년마다 다르다(그 학년의 가장 긴 학습 글에 맞춘 값 — style.css 참고).
-    // CSS가 학년을 알 수 있게 여기서 한 번 적어 둔다.
+    // 화면에 학년을 적어 둔다. ※지금 이 표시를 보고 모양을 바꾸는 CSS는 하나도 없다 —
+    // 학년마다 달랐던 학습창 높이가 2026-07-29에 하나로 합쳐지면서 마지막 쓰임이 사라졌다.
+    // 남겨 두는 이유는 화면만 보고 어느 학년인지 알 수 있어야 해서다(검사·문의 대응).
     document.body.dataset.grade = window.G.grade;
     Screens.applyLabels();
     wire();

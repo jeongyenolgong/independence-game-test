@@ -2,6 +2,8 @@
 (function () {
   'use strict';
   const SPEED = { '느리게': 55, '보통': 30, '빠르게': 14 };
+  // 3자리를 다 친 뒤 판정까지의 텀. 이 한 값이 포스터 찾기와 코드입력 퀴즈 양쪽을 지배한다.
+  const CODE_DELAY = 550;
   const $ = (id) => document.getElementById(id);
 
   // speaker → 편지/쪽지 필체 폰트 클래스
@@ -32,8 +34,19 @@
   }
 
   // ---------- 초상 층(D 반전용) ----------
-  // 코드로 찾아낸 정답 포스터가 ◯-2 반전 장면 내내 서 있다. 이름은 여기서 밝히지
-  // 않는다(screen_spec 【D】 — 실명은 ◯-4 인물 맞히기에서 처음 공개).
+  // 코드로 찾아낸 정답 포스터가 **그 장소에 머무는 동안 내내** 서 있다. 이름은 여기서
+  // 밝히지 않는다(screen_spec 【D】 — 실명은 ◯-4 인물 맞히기에서 처음 공개).
+  //
+  // 예전엔 ◯-2 한 장면에서만 세웠다. 그래서 증표(태극기)를 확인하고 대사창으로 돌아오면
+  // 얼굴이 사라져, 누구와 이야기하는 중인지 알 수 없었다(사용자 지적 2026-07-29).
+  // → 찾아낸 순간부터 **배경이 바뀔 때까지** 세워 둔다. 릴레이 한 사람은 ◯-1~◯-5가
+  //   전부 같은 배경이고 다음 사람에서 배경이 갈리므로, '배경이 같은 동안'이 곧
+  //   사용자가 말한 "장소 전환이 되기 전까지"다. 장면 이름(◯-2·◯-3·◯-5)을 짐작해
+  //   나열하지 않는 이유: 16-5(만세)만 혼자 배경이 바뀌는데, 이름으로 세면 거기에도
+  //   얼굴이 서서 만세 폭발을 가린다.
+  let CURRENT_POSTER = null;   // 이 릴레이에서 찾아낸 정답 포스터
+  let PORTRAIT_BG = '';        // 그 포스터를 세울 때의 배경(이게 바뀌면 얼굴을 걷는다)
+
   function clearPortrait() {
     const layer = $('portrait-layer');
     layer.classList.add('hidden');
@@ -47,6 +60,14 @@
     layer.appendChild(fig);
     layer.classList.remove('hidden');
   }
+  // 이미 서 있으면 그대로 둔다. 장면마다 다시 만들면 반전 직후(◯-2 첫 장면)에
+  // 방금 떠오른 얼굴이 한 번 깜빡인다.
+  function keepPortrait() {
+    const layer = $('portrait-layer');
+    if (layer.firstChild) { layer.classList.remove('hidden'); return; }
+    showPortrait(CURRENT_POSTER);
+  }
+  function currentBg() { return $('bg').style.getPropertyValue('--bg-img'); }
 
   // ---------- 연출 효과 ----------
   function resetPersistentFx() {
@@ -138,6 +159,8 @@
   // ---------- 무대 세팅 = 배경 그림 ----------
   // staging.bg_img 칸에 적힌 그림을 그 장면 배경으로 깐다. 비어 있으면(아직 안 그려진
   // 장소) 회색 그라데이션 플레이스홀더로 남는다 — 섞여 있어도 화면이 깨지지 않게.
+  // 장소가 실제로 바뀌었으면 true를 돌려준다 — 부르는 쪽(playScene)이 그만큼
+  // 대사를 늦춰, 새 장소를 볼 틈을 준다.
   function setStaging(sceneId) {
     const stg = (window.G.data.staging || {})[sceneId] || {};
     const bg = $('bg');
@@ -146,7 +169,8 @@
     // 매번 겹쳐 지우면 이유 없이 화면이 깜빡인다.
     const before = bg.style.getPropertyValue('--bg-img');
     const after = stg.bg_img ? 'url("' + new URL(stg.bg_img, document.baseURI).href + '")' : '';
-    if (prev && before && before !== after) {
+    const moved = !!(before && before !== after);
+    if (prev && moved) {
       prev.style.backgroundImage = before;
       prev.classList.remove('is-fading'); void prev.offsetWidth; prev.classList.add('is-fading');
     }
@@ -161,6 +185,7 @@
       bg.style.removeProperty('--bg-img');
       bg.classList.remove('has-img');
     }
+    return moved;
   }
 
   // ---------- 타자기 ----------
@@ -381,17 +406,23 @@
     return lines.filter((l) => l.aud === '공통' || l.aud === g);
   }
 
-  // 반전 장면(◯-2) = 군중에서 고른 초상이 그대로 서 있어야 하는 유일한 장면.
-  function isRevealScene(sceneId) {
-    return (window.G.data.relays || []).some((r) => (r.base + '-2') === String(sceneId));
-  }
-
   // ---------- 장면 재생 ----------
   Engine.playScene = async function (sceneId, onDone) {
-    setStaging(sceneId);
+    const moved = setStaging(sceneId);
     resetPersistentFx();
-    if (!isRevealScene(sceneId)) clearPortrait();
+    // 찾아낸 얼굴은 배경이 그대로인 동안 계속 서 있는다(위 CURRENT_POSTER 주석 참고).
+    // setStaging 뒤에 봐야 한다 — 이 장면의 새 배경과 비교하는 것이기 때문.
+    if (CURRENT_POSTER && currentBg() && currentBg() === PORTRAIT_BG) keepPortrait();
+    else { clearPortrait(); CURRENT_POSTER = null; }
     $('caption-layer').classList.add('hidden');
+    // 장소가 바뀐 장면은 대사를 한 박자 늦춘다(사용자 지적 2026-07-29).
+    // 예전엔 배경이 녹아드는 것과 첫 글자가 동시에 시작해, 새 장소를 볼 틈이 아예 없었다.
+    // 디졸브(3.2초)가 다 끝나기를 기다리진 않는다 — 그러면 화면이 멎은 것처럼 느껴진다.
+    // 그림이 절반쯤 넘어온 지점에서 글이 시작되면 '도착해서 말을 건다'로 읽힌다.
+    if (moved) {
+      $('dialogue-box').classList.add('hidden');
+      await pause(1200);
+    }
     const raw = (window.G.data.scenes[sceneId] || []);
     const lines = forGrade(raw);
     let i = 0;
@@ -580,6 +611,7 @@
     layer.classList.remove('is-busy');   // 앞 릴레이가 남겼을 수 있는 잠금 상태를 걷고 시작
     layer.classList.remove('quiz-mode'); // 퀴즈가 같은 층을 쓰므로 그 모드 잔재도 걷는다
     clearPortrait();
+    CURRENT_POSTER = null;               // 앞사람 얼굴은 여기서 끝난다(찾는 동안엔 아무도 안 선다)
     $('find-prompt').textContent = L['find.prompt'] || '';
     const input = buildInput();
     resetSlots();
@@ -626,7 +658,10 @@
         const v = el.value.replace(/\D/g, '').slice(0, 3);
         if (v !== el.value) el.value = v;
         if (busy) return;
-        if (v.length === 3) setTimeout(submit, 180);   // 세 자리째 = 자동 판정(확인 버튼 없음)
+        // 세 자리째 = 자동 판정(확인 버튼 없음). 180ms였는데 세 번째 숫자를 누르는 것과
+        // 결과가 사실상 동시라, 자기가 무엇을 쳤는지 보기도 전에 대사가 흘렀다(사용자 지적
+        // 2026-07-29). 친 번호가 입력칸에 한 번 읽히고 나서 판정이 오도록 한 박자 둔다.
+        if (v.length === 3) setTimeout(submit, CODE_DELAY);
       });
       el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') { e.preventDefault(); if (!busy && el.value.length === 3) submit(); }
@@ -685,7 +720,9 @@
         lock(false, false);         // is-busy를 반드시 걷는다(다음 릴레이가 같은 층을 쓴다)
         // 암전 한 박자를 두고 밝아진다. 초상은 어둠 속에서 세워 두므로,
         // 빛이 돌아올 땐 그 사람이 이미 서 있다(정답이 '나타나는' 게 아니라 '드러난다').
-        await blackout(() => showPortrait(o));   // ◯-2 반전 장면 내내 서 있는다
+        CURRENT_POSTER = o;
+        PORTRAIT_BG = currentBg();               // 이 배경이 바뀔 때까지 얼굴이 서 있는다
+        await blackout(() => showPortrait(o));
         if (onDone) onDone();
         return;
       }
@@ -743,12 +780,22 @@
       qEl.textContent = L['quiz.identity_q'] || '지금 이 대화 속 주인공은 누구일까요?';
       optWrap.innerHTML = '';
       optWrap.classList.add('is-names');   // 이름 4칸 가로 배치(옛 ui.js 관찰자 대체)
+      // ⚠️앞 릴레이가 남긴 잠금을 반드시 걷는다. 칸(button)은 위에서 새로 만들어지지만
+      //   is-locked는 이 묶음(#quiz-options)에 붙는 것이라, 안 걷으면 **다음 인물** 퀴즈가
+      //   눌리지 않는 채로 열린다(열 번 돌려 쓰는 한 개짜리 판이다).
+      optWrap.classList.remove('is-locked');
       opts.forEach((name) => {
         const b = document.createElement('button');
         b.className = 'quiz-opt'; b.textContent = name;
-        b.onclick = () => {
-          if (name === person) { panel.classList.add('hidden'); resolve(); }
-          else { screenShake(); }   // 오답: 화면 흔들림, 피드백 문구 없음
+        b.onclick = async () => {
+          if (name !== person) { screenShake(); return; }   // 오답: 화면 흔들림, 피드백 문구 없음
+          // 정답 = 맞힌 칸을 먹선으로 세우고 한 박자 멈춘 뒤 넘어간다(사용자 확정 2026-07-29).
+          // 예전엔 누르는 즉시 판이 사라져, 맞혔다는 것을 인지하기 전에 다음 화면이 와 있었다.
+          b.classList.add('is-correct');
+          optWrap.classList.add('is-locked');   // 물러나는 동안 다른 칸이 눌리지 않게
+          await pause(1000);
+          panel.classList.add('hidden');
+          resolve();
         };
         optWrap.appendChild(b);
       });
@@ -765,6 +812,12 @@
     const grade = window.G.grade;
     const q = (window.G.data.quiz[grade] || {})[sceneId];
     const L = window.G.data.labels || {};
+
+    // 퀴즈 동안에는 얼굴을 잠시 걷는다. 정체 맞히기 판과 상시 학습판이 화면을 거의 다
+    // 덮는 데다, '누구인지 맞히는' 자리에 그 사람 그림이 함께 서 있으면 화면이 산만해진다.
+    // CURRENT_POSTER는 그대로 두므로, 퀴즈가 끝나고 ◯-5로 넘어가면 같은 얼굴이 다시 선다
+    // (사용자 요청: "퀴즈를 푼 다음에 다음 대사가 나올 때 유화가 나오면 좋겠음").
+    clearPortrait();
 
     // 1) 정체 맞히기(누구게?) — 화면 탭 그대로 유지(오프라인화 안 함)
     await identityQuiz(person);
@@ -805,7 +858,7 @@
       const v = input.value.replace(/\D/g, '').slice(0, 3);
       if (v !== input.value) input.value = v;
       if (busy) return;
-      if (v.length === 3) setTimeout(submit, 250);     // 세 자리째 = 자동 판정(약간의 여유)
+      if (v.length === 3) setTimeout(submit, CODE_DELAY);   // 찾기 화면과 같은 텀
     });
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); if (!busy && input.value.length === 3) submit(); }

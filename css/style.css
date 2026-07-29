@@ -24,12 +24,11 @@
      이름을 나눠 --ink-paper로 둔다(같은 이름을 겹쳐 썼다가 여백까지 갈색이 된 적 있음). */
   --paper-rgb:238,230,213; --ink-paper:#2b2118; --ink-soft:#6b5a44; --ink-line:60,48,34;
 
-  /* 팝업(학습창·퀴즈) 공통 치수 — 세 팝업이 같은 크기로 서야 해서 한 곳에 둔다.
-     min은 가장 긴 내용(초등 OX 해설 131자 + 해설칸 + 계속 버튼) 기준. */
+  /* 팝업(학습창·정체 맞히기) 공통 폭. 높이는 더 이상 공통이 아니다 —
+     두 팝업이 담는 것이 다르므로 각자 자기 내용에 맞는 높이로 선다(사용자 확정 2026-07-29).
+     높이는 각자 제 규칙(.learn-inner / .quiz-inner)에 적혀 있다 — 값이 하나씩뿐이라
+     변수로 빼지 않았다. */
   --panel-w:min(88%,560px);
-  /* vh로 잡으면 화면 높이마다 기준이 달라져, 낮은 화면에선 해설이 뜬 OX만 혼자 커진다.
-     그래서 고정값을 기준으로 두고, 화면이 아주 낮을 때만 76vh가 대신 받게 한다. */
-  --panel-min-h:min(480px,76vh);
 
   /* 글줄 최대 폭. 화면(#app)은 꽉 채우되 읽는 글은 여기서 묶는다.
      880px = 대사 19px 기준 한 줄 약 40자 — 한글이 편하게 읽히는 길이. */
@@ -361,7 +360,9 @@ body{
   flex-direction:column; align-items:center; justify-content:center; gap:14px;
   background:rgba(0,0,0,.35); }
 /* A2안 「한지 전단」 — 조작 UI는 종이·먹으로 통일(학습 패널과 같은 언어). */
-.choice-btn{ font-family:var(--dlg-font); width:min(80%,460px); text-align:left;
+/* 글자는 칸 가운데(사용자 지적 2026-07-29). 왼쪽 정렬이면 두 칸의 글 길이가 달라
+   문장이 각각 다른 데서 끝나 두 칸이 어긋나 보였다 — 칸 자체는 이미 가운데에 서 있다. */
+.choice-btn{ font-family:var(--dlg-font); width:min(80%,460px); text-align:center;
   background:rgba(var(--paper-rgb),.93); color:var(--ink-paper);
   border:1px solid rgba(var(--ink-line),.4); border-radius:2px;
   box-shadow:0 2px 8px rgba(0,0,0,.35);
@@ -421,51 +422,50 @@ body{
 /* 학습 패널 A₂(활판 인쇄물 스킨) */
 .learn-panel{ position:absolute; z-index:45; inset:0; display:flex;
   align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
-/* ── 학습창·퀴즈 공통 판 (사용자 지적 6·7·8, 2026-07-20) ─────────────────
-   크기가 내용에 따라 들쭉날쭉했다. 높이가 auto인 데다 상한이 없어 글이 곧 판 크기였고,
-   게다가 이름퀴즈와 OX가 같은 판을 돌려 쓰는 탓에 이어서 뜰 때 판이 출렁였다.
-   → 가장 긴 내용(초등 OX 해설 131자 + 해설칸 + 계속 버튼)을 기준으로 최소 높이를 잡아
-     세 팝업을 같은 크기로 세운다. 기준값은 맨 위 --panel-min-h.
+/* ── 학습창·정체 맞히기 판 ────────────────────────────────────────────
+   종이·테두리·줄무늬는 둘이 같고, **높이만 따로** 간다(사용자 확정 2026-07-29).
+   예전엔 480px 한 값으로 둘을 같이 세웠는데, 그 값은 지금은 없어진 옛 OX·4지선다
+   퀴즈까지 함께 담으려던 크기였다. 남은 둘은 담는 것이 서로 달라 같이 설 이유가 없다.
    max-height는 안전장치다 — 이 게임은 스크롤이 막혀 있어(#app overflow:hidden)
-   판이 화면보다 커지면 잘린 채 되찾을 방법이 없다. 중등 4지선다처럼 정말 긴 경우만
-   판 안에서 스크롤된다. */
+   판이 화면보다 커지면 잘린 채 되찾을 방법이 없다. */
 .learn-inner, .quiz-inner{
-  width:var(--panel-w); min-height:var(--panel-min-h); max-height:84vh; overflow-y:auto;
+  width:var(--panel-w); max-height:84vh; overflow-y:auto;
   background:var(--paper); color:#241c10; border:2px solid #3a2c14; border-radius:6px;
-  padding:28px 26px; box-shadow:0 12px 40px rgba(0,0,0,.6); position:relative;
+  box-shadow:0 12px 40px rgba(0,0,0,.6); position:relative;
   display:flex; flex-direction:column;
   background-image:repeating-linear-gradient(0deg,transparent 0 30px,rgba(0,0,0,.04) 30px 31px); }
 /* 학습창 — 글은 위, 넘김 줄은 판 맨 아래. 페이지를 넘겨도 버튼이 제자리에 있다. */
 .learn-inner{ justify-content:space-between; }
-/* 학습창 높이는 위 480px에서 떼어 낸다(사용자 지적 2026-07-28: 글에 비해 여백이 너무 많다).
-   480px은 지금은 없어진 옛 OX·4지선다 퀴즈까지 함께 세우려던 값이라, 학습 글에는 과했다.
-   → **학년별로 그 학년의 가장 긴 학습 글**에 맞춘다. 실제로 재 본 값(가장 긴 쪽 기준):
-       초등 347px(744높이)·364px(800)·371px(823 이상)  ← 14-3 안중근
-       중등 309px(744)·323px(800)·371px(823 이상)      ← 11-3·13-3·14-3
-   글자 크기가 clamp(…,2.55vh,21px)로 화면 높이를 따라가므로 vh로 잡되, 21px에서 글자가
-   멈추는 823px 위부터는 px 상한이 받는다. 여기에 여유 한 뼘(약 3%)을 얹은 값이다.
-   ※min-height는 바닥이지 뚜껑이 아니다 — 친일파 학습 글(가장 길어 460~539px)은 이 값을
-     넘어 스스로 커진다. 잘리지 않으며, max-height 84vh가 화면 밖으로 나가는 것만 막는다.
-   ⚠️기본값을 body에 두는 이유: 학년 표시(body[data-grade])는 game.json을 받은 뒤에야 붙는다.
-     그 전에 480px 같은 다른 값으로 떨어지면 학습창 높이가 두 갈래가 된다. 기본을 초등 값으로
-     두고 중등만 덮어쓰면, 어느 시점에 재도 학습창은 늘 이 둘 중 하나다. */
-body{ --learn-min-h:min(48vh,376px); }                    /* 기본 = 초등 */
-body[data-grade="중등"]{ --learn-min-h:min(43vh,376px); }
-.learn-inner{ min-height:var(--learn-min-h); }
-.learn-text{ font-size:clamp(16px,2.55vh,21px); line-height:2; letter-spacing:.3px; min-height:120px; }
+
+/* ── 학습창 = 퀴즈 때 뜨는 상시 학습판(.quiz-learn)과 같은 크기 (사용자 확정 2026-07-29) ──
+   지금까지는 학년별 376px 고정이라, 27자짜리 쪽에서도 빈 줄이 다섯 줄 남았다
+   (글 길이가 27~149자로 편차가 커서 '가장 긴 글 기준'이 짧은 쪽을 다 헐겁게 만들었다).
+   그 판은 이미 **같은 학습 글**을 246px 안에 스크롤 없이 담고 있다 — 글자가 한 톤 작기
+   때문이다. 그래서 글자 크기·안여백·넘김 줄까지 그 판에 맞추면 팝업도 같은 높이로 선다.
+   실측(730px 화면): 27자 226px · 149자 229px — 어느 인물에서도 스크롤이 안 걸린다.
+   ※min-height는 바닥이지 뚜껑이 아니다 — 친일파 학습 글은 이 값을 넘어 스스로 커진다.
+     잘리지 않으며, 위 max-height 84vh가 화면 밖으로 나가는 것만 막는다.
+   ※학년별로 가르던 것을 하나로 합쳤다: 기준이 '그 학년의 가장 긴 글'이 아니라
+     '.quiz-learn과 같은 크기'로 바뀌어, 학년을 나눌 이유가 없어졌다. */
+.learn-inner{ min-height:min(31vh,246px); padding:14px 20px 10px; }
+.learn-text{ font-size:clamp(14px,2.2vh,18px); line-height:1.95; letter-spacing:.3px; }
 .learn-text b{ color:var(--crimson); font-weight:700; }
-.learn-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:18px;
-  border-top:1px solid #cbb98f; padding-top:12px; }
+.learn-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:8px;
+  border-top:1px solid #cbb98f; padding-top:6px; }
 .learn-nav button{ font-family:var(--dlg-font); background:transparent; border:1px solid #b8a06a;
-  color:#3a2c14; border-radius:8px; padding:8px 16px; cursor:pointer; font-size:14px; }
+  color:#3a2c14; border-radius:3px; padding:5px 12px; cursor:pointer; font-size:13px; }
 .learn-nav button:disabled{ opacity:.3; }
 #learn-progress{ color:#7a6640; font-size:13px; }
 
 /* 퀴즈 패널 */
 .quiz-panel{ position:absolute; z-index:45; inset:0; display:flex;
   align-items:center; justify-content:center; background:rgba(0,0,0,.55); }
-/* 퀴즈 — 문항·선택지가 판 한가운데. 해설과 계속 버튼이 나타나도 판 크기는 그대로다. */
-.quiz-inner{ justify-content:center; text-align:center; }
+/* 정체 맞히기 — 문항 한 줄 + 이름 네 칸이 판 한가운데.
+   480px에서 200px로 내렸다(사용자 확정 2026-07-29). 담는 것이 두 줄뿐이라 480px에선
+   위아래가 통째로 비어, 판만 크고 안은 텅 빈 화면으로 읽혔다. 내용에 딱 붙이면 164px인데
+   거기서 위아래로 숨통을 한 번 더 준 값이 200px이다. */
+.quiz-inner{ justify-content:center; text-align:center;
+  min-height:200px; padding:28px 26px; }
 .quiz-q{ font-size:clamp(16px,2.55vh,21px); line-height:1.7; margin-bottom:20px; color:#241c10; }
 .quiz-options{ display:flex; flex-direction:column; gap:10px; }
 /* 이름 퀴즈만 가로 4칸 — 선택지가 인물 이름(최장 4자)뿐이라 세로로 쌓으면 판이 커진다.
@@ -477,6 +477,17 @@ body[data-grade="중등"]{ --learn-min-h:min(43vh,376px); }
   background:rgba(255,255,255,.5); border:1px solid rgba(var(--ink-line),.42);
   border-radius:2px; padding:14px 16px; cursor:pointer; line-height:1.5; }
 .quiz-opt:active{ background:rgba(var(--ink-line),.1); }
+/* 맞힌 칸 = 먹선 링 (사용자 확정 2026-07-29).
+   예전엔 맞히는 즉시 판이 사라져 "내가 맞혔는지 인지를 못 하고 다음 화면으로 넘어갔다".
+   초록 체크 같은 것을 얹지 않는 이유: 이 게임의 정답 표시는 이미 코드 입력칸(.find-input.is-correct)이
+   먹선 링으로 하고 있다. 같은 결로 맞춰야 두 화면이 한 게임으로 읽힌다.
+   멈추는 한 박자는 engine.js identityQuiz가 준다(약 1초). */
+.quiz-opt.is-correct{
+  border-color:rgba(var(--ink-line),.95);
+  box-shadow:0 0 0 2px rgba(var(--ink-line),.45);
+  background:rgba(220,210,190,.98); }
+/* 판이 물러나는 동안 다른 칸이 눌리지 않게. 색은 건드리지 않는다 — 맞힌 칸만 도드라지면 된다. */
+.quiz-options.is-locked .quiz-opt{ pointer-events:none; }
 
 /* ---------- 도감 ---------- */
 #screen-codex{ background:#141009; justify-content:flex-start; z-index:70; }
